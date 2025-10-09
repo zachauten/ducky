@@ -1,0 +1,12 @@
+{
+  "tasks": {
+    "dev": "deno run --watch main.ts"
+  },
+  "imports": {
+    "@readme/openapi-parser": "npm:@readme/openapi-parser@^5.0.2",
+    "@std/assert": "jsr:@std/assert@1",
+    "@std/cli": "jsr:@std/cli@^1.0.23",
+    "@std/fs": "jsr:@std/fs@^1.0.19",
+    "mustache": "npm:mustache@^4.2.0"
+  }
+}
