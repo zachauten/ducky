@@ -20,14 +20,22 @@ type IntegerTypeInfo = {
   format?: string;
 };
 
+type BooleanTypeInfo = {
+  type: "boolean";
+  default: boolean;
+}
+
+type RefTypeInfo = {
+  type: never;
+  $ref: string;
+}
+
 type ArrayTypeInfo = {
   type: "array";
-  items: {
-    $ref: `#/components/schemas/${string}`;
-  };
+  items: TypeInfo;
 };
 
-type TypeInfo = StringTypeInfo | IntegerTypeInfo | ArrayTypeInfo;
+type TypeInfo = StringTypeInfo | IntegerTypeInfo | BooleanTypeInfo | ArrayTypeInfo | RefTypeInfo;
 
 interface FieldInfo {
   signature: string;
@@ -39,10 +47,11 @@ const template = Deno.readTextFileSync("template.mustache");
 if (import.meta.main) {
   const args = parseArgs(Deno.args);
   const openapi = await parse(args._[0] as string);
+  console.log(openapi)
   await parseOpenAPI(openapi);
 }
 
-async function parseOpenAPI(openapi: any) {
+export async function parseOpenAPI(openapi: any) {
   for (const [name, details] of Object.entries(openapi.components.schemas)) {
     const fields = Object.entries(details.properties).map((
       [name, typeinfo],
@@ -89,14 +98,21 @@ function mapTypeToJava(typeinfo: TypeInfo, optional: boolean): FieldInfo {
     signature = "Integer";
   } else if (typeinfo.type === "string") {
     signature = "String";
+  } else if (typeinfo.type === "boolean") {
+    signature = "Boolean";
   } else if (typeinfo.type === "array") {
-    const inner = typeinfo.items.$ref.split("/").at(-1);
+    console.log(JSON.stringify(typeinfo));
+    // const inner = typeinfo.items.$ref.split("/").at(-1);
+    const inner = mapTypeToJava(typeinfo.items, false);
     signature = `List<${inner}>`;
     imports.push("java.util.List");
+  } else if (typeinfo.$ref !== undefined) {
+    const split = typeinfo.$ref.split("/");
+    signature = split.at(-1);
   }
 
   if (signature === undefined) {
-    throw new Error(`Type is undefined: ${typeinfo}`);
+    throw new Error(`Type is undefined: ${JSON.stringify(typeinfo)}`);
   }
 
   if (optional) {
