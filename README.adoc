@@ -1,0 +1,10 @@
+= 🦆 Ducky: Generate Java POJOs from an OpenAPI schema
+
+== Why?
+I found link:https://github.com/OpenAPITools/openapi-generator[openapi-generator-cli] to be mostly focused on generating http clients, and bundles a lot of boilerplate and some dependencies that I don't want.
+
+== Usage
+[source,bash]
+```
+deno run -A main.ts ./openapi/test.yaml
+```

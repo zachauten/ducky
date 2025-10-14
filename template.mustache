@@ -1,7 +1,11 @@
 package {{ package }};
 
-public record {{ record }} (
+{{ #imports }}
+import {{ path }};
+{{ /imports }}
+
+public record {{ name }} (
 {{ #fields }}
-    {{{ type }}} {{ name }}{{ #comma }},{{ /comma }}
+    {{{ signature }}} {{ name }}{{ #comma }},{{ /comma }}
 {{ /fields }}
 ) {}
