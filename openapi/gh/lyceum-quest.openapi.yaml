@@ -1,0 +1,1707 @@
+openapi: 3.0.2
+info: 
+  title: Yandex Lyceum Quest Constructor API
+  description: |-
+    # Introduction
+
+    Yandex Lyceum is an educational project where school students and university students gain IT skills, focusing on Python and Go programming languages. They also delve into machine learning, chatbot development, game creation, and other product developments.
+
+    # Quest Constructor API
+
+    This API allows the creation of quests designed to assess the knowledge level of potential students. Based on the results, the quest provides recommendations on the most suitable course for admission to Yandex Lyceum.
+
+    ## **Using The API**
+
+    This API enables developers to create and manage these quests, ensuring a personalized experience for each participant based on their skills and knowledge.
+
+    # Authentication & Rate Limits
+
+    Ensure that all requests to the API are authenticated and comply with the rate limits.
+
+    # Terms of Use, Copyright, and Attribution
+
+    Please make sure you comply with the following policies before using any data within this API:
+
+    - [Terms of Use](https://summer-school-2024.gitlab.yandexcloud.net/summer-school-group/team-29/-/tree/main?ref_type=heads)
+    - [Privacy Policy](https://summer-school-2024.gitlab.yandexcloud.net/summer-school-group/team-29/-/tree/main?ref_type=heads)
+
+    # Contact Us
+
+    For support or any inquiries, please contact us via [email](mailto:aleksashkin@yandex-team.ru) or visit our [help page](https://lyceum.yandex.ru).
+  termsOfService: "https://summer-school-2024.gitlab.yandexcloud.net/summer-school-group/team-29/-/tree/main?ref_type=heads"
+  version: "1.0.0"
+servers:
+  - url: https://api.darkony.ru/
+tags:
+  - name: Chat
+    description: All requests for client side (chat)
+    externalDocs:
+      description: Check test chat here
+      url: https://darkony.ru/chat/1
+  - name: Admin
+    description: Access to Constructor Admin panel
+    externalDocs:
+      description: Check admin panel
+      url: https://darkony.ru/admin/
+paths:
+  /client/v1/quest/{id}:
+    get:
+      tags:
+        - Chat
+      summary: Start a new quest
+      description: Start a new quest based on the provided quest ID.
+      operationId: getQuestById
+      parameters:
+        - name: id
+          in: path
+          description: Quest UUID
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved quest details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  quest_id:
+                    description: Quest UUID
+                    type: string
+                    format: uuid
+                  session_id:
+                    description: Session ID
+                    type: string
+                    format: uuid
+                  is_last:
+                    description: indicates if this message sequence was last
+                    type: boolean
+                  messages:
+                    $ref: "#/components/schemas/MessageSequence"
+        "404":
+          description: Quest not found
+
+  /client/v1/quest:
+    post:
+      tags:
+        - Chat
+      summary: Continue the quest
+      description: Send client's answer and get the new message sequence.
+      operationId: continueQuest
+      requestBody:
+        description: Client's response to continue the quest
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContunueQuestBody"
+        required: true
+      responses:
+        "200":
+          description: Successfully retrieved the next part of the quest
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  quest_id:
+                    description: Quest UUID
+                    type: string
+                    format: uuid
+                  is_last:
+                    description: Indicates if this message sequence was the last
+                    type: boolean
+                  messages:
+                    $ref: "#/components/schemas/MessageSequence"
+        "400":
+          description: Incorrect request body
+        "404":
+          description: Resource not found
+
+  /client/v1/cities:
+    get:
+      tags:
+        - Chat
+      summary: Retrieve all cities with Yandex Lyceums
+      description: Fetches a list of all cities that have Yandex Lyceums.
+      operationId: getCities
+      responses:
+        "200":
+          description: Successfully retrieved list of cities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    city_id:
+                      description: Unique identifier for the city
+                      type: string
+                      format: uuid
+                    name:
+                      description: Name of the city
+                      type: string
+                    has_lyceum:
+                      description: Indicates if a Yandex Lyceum is present in the city
+                      type: boolean
+  /api/v1/admin/login:
+    post:
+      tags:
+        - Admin
+      summary: Admin login
+      description: Login to the system using credentials.
+      operationId: adminLogin
+      requestBody:
+        description: Credentials required to log into the system
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                login:
+                  description: Admin login
+                  type: string
+                password:
+                  description: Admin password
+                  type: string
+              required:
+                - login
+                - password
+        required: true
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    description: Authentication token
+                    type: string
+                  user_id:
+                    description: Unique identifier for the user
+                    type: string
+                    format: uuid
+                  status_id:
+                    description: Status identifier
+                    type: string
+                    format: uuid
+                  status_title:
+                    description: Description of the status
+                    type: string
+        "401":
+          description: Empty credentials provided
+        "404":
+          description: Invalid credentials or no active account found
+    delete:
+      tags:
+        - Admin
+      summary: Admin logout
+      description: Logout from the system.
+      operationId: adminLogout
+      security:
+        - UserTicketAuth: []
+      responses:
+        "200":
+          description: Logout successful
+        "401":
+          description: Invalid or expired authorization token
+  /api/v1/admin/characters:
+    post:
+      tags:
+        - Admin
+      description: creates new character
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  description: character name
+                  type: string
+                avatar:
+                  description: url to character avatar
+                  type: string
+                  format: url
+                full_size_image:
+                  description: url to full-size picture of character
+                  type: string
+                  format: url
+              required:
+                - name
+                - avatar
+                - full_size_image
+      security:
+        - UserTicketAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Character"
+        "400":
+          description: Invalid input parameters
+        "401":
+          description: Invalid or expired Authorization token
+    get:
+      tags:
+        - Admin
+      description: list all characters
+      security:
+        - UserTicketAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  characters:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Character"
+        "401":
+          description: Invalid or expired Authorization token
+  /api/v1/admin/characters/{id}:
+    get:
+      tags:
+        - Admin
+      description: get character by its identifier
+      parameters:
+        - name: id
+          in: path
+          description: Character id
+          required: true
+          schema:
+            type: string
+      security:
+        - UserTicketAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Character"
+        "401":
+          description: Invalid or expired Authorization token
+        "404":
+          description: Character is not found
+    delete:
+      tags:
+        - Admin
+      description: delete character by identifier
+      parameters:
+        - name: id
+          in: path
+          description: Character id
+          required: true
+          schema:
+            type: string
+      security:
+        - UserTicketAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    description: identifier of deleted character
+                    type: string
+                    format: uuid
+                required:
+                  - id
+        "401":
+          description: Invalid or expired Authorization token
+        "404":
+          description: Character is not found
+    patch:
+      tags:
+        - Admin
+      description: update existing character
+      parameters:
+        - name: id
+          in: path
+          description: Character id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  description: character name
+                  type: string
+                avatar:
+                  description: url to character avatar
+                  type: string
+                  format: url
+                full_size_image:
+                  description: url to full-size picture of character
+                  type: string
+                  format: url
+      security:
+        - UserTicketAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Character"
+        "401":
+          description: Invalid or expired Authorization token
+        "404":
+          description: Character is not found
+  /api/v1/admin/user-get-roles:
+    get:
+      tags:
+        - Admin
+      description: Get all user roles
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserRole"
+  /api/v1/admin/user-get-statuses:
+    get:
+      tags:
+        - Admin
+      description: Get all user statuses
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserStatus"
+  /api/v1/admin/reset-password/{login}:
+    get:
+      tags:
+        - Admin
+      description: "Get user id by login"
+      parameters:
+        - name: login
+          in: path
+          description: user login
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+        "404":
+          description: No such login
+    patch:
+      tags:
+        - Admin
+      description: "Reset password"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  description: user's id
+                  type: string
+                  format: uuid
+                new_password:
+                  description: new password
+                  type: string
+                new_password_again:
+                  description: new password repeat
+                  type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: "Invalid new password"
+        "404":
+          description: "No such id"
+  /api/v1/admin/user-info:
+    get:
+      tags:
+        - Admin
+      description: "Get user info by auth token"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  first_name:
+                    type: string
+                  second_name:
+                    type: string
+                  status:
+                    type: string
+                  role:
+                    type: string
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: No such user
+      security:
+        - UserTicketAuth: []
+    patch:
+      tags:
+        - Admin
+      description: "Change first_name or second_name"
+      security:
+        - UserTicketAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                new_first_name:
+                  type: string
+                new_second_name:
+                  type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: "Invalid new name"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "No such user"
+
+  /api/v1/admin/managers:
+    post:
+      tags:
+        - Admin
+      description: creates new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                login:
+                  description: user login
+                  type: string
+                password:
+                  description: user password
+                  type: string
+                role_id:
+                  description: user role id
+                  type: string
+                  format: uuid
+                status_id:
+                  description: user status id
+                  type: string
+                  format: uuid
+                first_name:
+                  type: string
+                second_name:
+                  type: string
+              required:
+                - login
+                - password
+                - role_id
+                - status_id
+                - first_name
+                - second_name
+      security:
+        - UserTicketAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Invalid input parameters
+        "401":
+          description: Invalid or expired Authorization token / Not an admin
+    get:
+      tags:
+        - Admin
+      description: list all users
+      security:
+        - UserTicketAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  characters:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/User"
+        "401":
+          description: Invalid or expired Authorization token / Not an admin
+  /api/v1/admin/managers/{id}:
+    get:
+      tags:
+        - Admin
+      description: get user by its identifier
+      parameters:
+        - name: id
+          in: path
+          description: User id
+          required: true
+          schema:
+            type: string
+      security:
+        - UserTicketAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Invalid or expired Authorization token
+        "404":
+          description: User is not found
+    patch:
+      tags:
+        - Admin
+      description: update existing user's status and role
+      parameters:
+        - name: id
+          in: path
+          description: User id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role_id:
+                  description: user role id
+                  type: string
+                  format: uuid
+                status_id:
+                  description: user status id
+                  type: string
+                  format: uuid
+      security:
+        - UserTicketAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Invalid parameters
+        "401":
+          description: Invalid or expired Authorization token / Not an admin
+        "404":
+          description: User is not found
+  /api/v1/admin/update-password:
+    patch:
+      tags:
+        - Admin
+      description: "Update own password"
+      security:
+        - UserTicketAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                new_password:
+                  description: new password
+                  type: string
+                new_password_again:
+                  description: new password repeat
+                  type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Invalid parameters
+        "401":
+          description: Invalid or expired Authorization token / Not an admin
+  /api/v1/admin/quests:
+    post:
+      tags:
+        - Admin
+      description: creates new quest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Quest"
+      security:
+        - UserTicketAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuestGlobal"
+        "400":
+          description: Invalid input parameters
+        "401":
+          description: Invalid or expired Authorization token
+    get:
+      tags:
+        - Admin
+      description: list all quests
+      security:
+        - UserTicketAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/QuestGlobal"
+        "401":
+          description: Invalid or expired Authorization token
+  /api/v1/admin/quests/{id}:
+    get:
+      tags:
+        - Admin
+      description: get quest by its identifier
+      parameters:
+        - name: id
+          in: path
+          description: Quest id
+          required: true
+          schema:
+            type: string
+      security:
+        - UserTicketAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuestDetailed"
+        "401":
+          description: Invalid or expired Authorization token
+        "404":
+          description: Quest is not found
+    patch:
+      tags:
+        - Admin
+      description: update existing quest by its identifier
+      parameters:
+        - name: id
+          in: path
+          description: Quest id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Quest"
+      security:
+        - UserTicketAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuestGlobal"
+        "400":
+          description: Invalid parameters
+        "401":
+          description: Invalid or expired Authorization token
+        "404":
+          description: Quest is not found
+
+  /api/v1/admin/upload-file:
+    post:
+      tags:
+        - Admin
+      description: "Upload file from user"
+      security:
+        - UserTicketAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                type:
+                  description: image, file or video
+                  type: string
+                file_name:
+                  description: file name without slashes
+                  type: string
+                file:
+                  description: binary file
+                  format: binary
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    description: file id'
+                  url:
+                    type: string
+                    format: url
+                    description: file adress
+        "400":
+          description: "Invalid input data or error in yandex storage service"
+        "401":
+          description: Invalid or expired Authorization token
+
+  /client/v1/analytics/is-redirected:
+    put:
+      tags:
+        - Admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                session_id:
+                  description: session id
+                  type: string
+      responses:
+        "200":
+          description: "Field is-redirected is changed successfully"
+        "400":
+          description: "No session id in request body"
+          content:
+            application/json:
+              schema:
+                properties:
+                  detail:
+                    type: string
+                    description: file id'
+        "404":
+          description: "No such session"
+          content:
+            application/json:
+              schema:
+                properties:
+                  detail:
+                    type: string
+                    description: file id'
+
+components:
+  schemas:
+    Character:
+      type: object
+      properties:
+        id:
+          description: character uuid
+          type: string
+          format: uuid
+        name:
+          description: character name
+          type: string
+        avatar:
+          description: url to character avatar
+          type: string
+          format: url
+        full_size_image:
+          description: url to full-size picture of character
+          type: string
+          format: url
+    User:
+      type: object
+      properties:
+        id:
+          description: user uuid
+          type: string
+          format: uuid
+        login:
+          description: user login
+          type: string
+        first_name:
+          description: user first name
+          type: string
+        second_name:
+          description: user second name
+          type: string
+        role_id:
+          description: user role id
+          type: string
+          format: uuid
+        role_title:
+          description: user role title
+          type: string
+        status_id:
+          description: user status id
+          type: string
+          format: uuid
+        status_title:
+          description: user status title
+          type: string
+          format: uuid
+    TextMessage:
+      type: object
+      required: [message_id, type, text, author]
+      properties:
+        message_id:
+          description: message uuid
+          type: string
+          format: uuid
+        type:
+          description: message type
+          type: string
+          examples: ["text"]
+        character:
+          type: object
+          $ref: "#/components/schemas/Character"
+          description: message author
+        text:
+          description: message text
+          type: string
+        author:
+          description: bot or user
+          type: string
+    Attachment:
+      type: object
+      properties:
+        id:
+          description: attachment uuid
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          type: string
+        extension:
+          type: string
+        size_in_kbytes:
+          type: string
+        url:
+          type: string
+    AttachmentMessage:
+      type: object
+      required: [message_id, type, attachments, author]
+      properties:
+        message_id:
+          description: AttachmentMessage uuid
+          type: string
+          format: uuid
+        type:
+          description: message type
+          type: string
+          examples: [attachment]
+        character:
+          description: attachment author
+          $ref: "#/components/schemas/Character"
+          type: object
+        attachments:
+          description: "list of attachments"
+          type: array
+          items:
+            $ref: "#/components/schemas/Attachment"
+        author:
+          description: bot or user
+          type: string
+    CityInputMessage:
+      type: object
+      required: [message_id, type, author]
+      properties:
+        message_id:
+          description: CityInputMessage uuid
+          type: string
+          format: uuid
+        type:
+          description: message type
+          type: string
+        author:
+          description: bot or user
+          type: string
+        has_lyceum_next_message_character:
+            description: info about next message author
+            $ref: '#/components/schemas/Character'
+            type: object
+        no_lyceum_next_message_character:
+            description: info about next message author
+            $ref: '#/components/schemas/Character'
+            type: object
+
+    ActionCardMessage:
+      type: object
+      required:
+        [
+          message_id,
+          type,
+          action_button,
+          next_task_button,
+          image_url,
+          text,
+          author,
+        ]
+      properties:
+        message_id:
+          description: AttachmentMessage uuid
+          type: string
+          format: uuid
+        type:
+          description: message type
+          type: string
+        character:
+          description: attachment author
+          $ref: "#/components/schemas/Character"
+          type: object
+        action_button:
+          description: button with URL to course
+          type: object
+          properties:
+            action_url:
+              description: url to course
+              type: string
+            placeholder:
+              description: button placeholder text
+              type: string
+        next_task_button:
+          description: button to continue quest
+          type: object
+          properties:
+            placeholder:
+              description: button placeholder text
+              type: string
+        image_url:
+          description: URL to image
+          type: string
+          format: url
+        title:
+          description: action card title
+          type: string
+        text:
+          description: action card text
+          type: string
+        author:
+          description: bot or user
+          type: string
+        next_message_character:
+          description: info about next message author
+          $ref: '#/components/schemas/Character'
+          type: object       
+
+    Button:
+      type: object
+      properties:
+        button_id:
+          description: ButtonMessage uuid
+          type: string
+          format: uuid
+        text:
+          type: string
+          description: text on a button
+        placeholder:
+          type: string
+          description: text on a message after submitting
+        next_task_id:
+          type: string
+          description: next message id
+          format: uuid
+        next_message_character:
+          description: info about next message author
+          $ref: '#/components/schemas/Character'
+          type: object   
+
+    KeyboardMessage:
+      description: message with buttons
+      type: object
+      required: [message_id, type, keyboard, author]
+      properties:
+        message_id:
+          description: KeyboardMessage uuid
+          type: string
+          format: uuid
+        type:
+          description: message type
+          type: string
+          examples: [keyboard]
+        keyboard:
+          description: list of lists of buttons
+          type: array
+          items:
+            type: array
+            items:
+              $ref: "#/components/schemas/Button"
+        author:
+          description: bot or user
+          type: string
+    MessageSequence:
+      type: array
+      items:
+        anyOf:
+          - $ref: "#/components/schemas/TextMessage"
+          - $ref: "#/components/schemas/AttachmentMessage"
+          - $ref: "#/components/schemas/CityInputMessage"
+          - $ref: "#/components/schemas/KeyboardMessage"
+          - $ref: "#/components/schemas/ActionCardMessage"
+    ContunueQuestBody:
+      type: object
+      properties:
+        quest_id:
+          description: quest uuid
+          type: string
+          format: uuid
+        message_id:
+          description: message uuid
+          type: string
+          format: uuid
+        session_id:
+          description: session id'
+          type: string
+          format: uuid
+        button_id:
+          description: button uuid (optional)
+          type: string
+          format: uuid
+        city_id:
+          description: city uuid (optional)
+          type: string
+          format: uuid
+      required:
+        - quest_id
+        - message_id
+        - session_id
+    UserRole:
+      type: object
+      properties:
+        id:
+          description: role uuid
+          type: string
+          format: uuid
+        title:
+          description: role title
+          type: string
+    UserStatus:
+      type: object
+      properties:
+        id:
+          description: status uuid
+          type: string
+          format: uuid
+        title:
+          description: role title
+          type: string
+    TextData:
+      type: object
+      required: [text, next_task_id]
+      properties:
+        text:
+          description: message text
+          type: string
+        next_task_id:
+          description: next message id
+          type: string
+          format: uuid
+    AttachmentData:
+      type: object
+      required: [next_task_id]
+      properties:
+        next_task_id:
+          description: next message id
+          type: string
+          format: uuid
+    CityInputData:
+      type: object
+      required: [has_lyceum_next_id, no_lyceum_next_id]
+      properties:
+        has_lyceum_next_id:
+          type: string
+          format: uuid
+        no_lyceum_next_id:
+          type: string
+          format: uuid
+    KeyboardData:
+      type: object
+      required: [keyboard]
+      properties:
+        keyboard:
+          description: list of lists of buttons
+          type: array
+          items:
+            type: array
+            items:
+              $ref: "#/components/schemas/Button"
+    ActionCardData:
+      type: object
+      required: [title, text, action_button, next_task_button, next_task_id]
+      properties:
+        title:
+          description: message title
+          type: string
+        text:
+          description: message text
+          type: string
+          exampls: [action_card]
+        action_button:
+          description: button with URL to course
+          type: object
+          properties:
+            action_url:
+              description: url to course
+              type: string
+            placeholder:
+              description: button placeholder text
+              type: string
+        next_task_button:
+          description: button to continue quest
+          type: object
+          properties:
+            placeholder:
+              description: button placeholder text
+              type: string
+        next_task_id:
+          description: next message id
+          type: string
+          format: uuid
+    TextAdminMessage:
+      type: object
+      required: [id, order_id, is_first, quest_task_type_id, data, author]
+      properties:
+        id:
+          description: message uuid
+          type: string
+          format: uuid
+        order_id:
+          description: message order id
+          type: string
+          format: uuid
+        is_first:
+          type: boolean
+        quest_task_type_id:
+          description: message type id
+          type: string
+        data:
+          type: object
+          $ref: "#/components/schemas/TextData"
+          description: message data
+        author:
+          description: bot or user
+          type: string
+        character_id:
+          description: message character id
+          type: string
+          format: uuid
+    AttachmentAdminMessage:
+      type: object
+      required: [id, order_id, is_first, quest_task_type_id, data, author]
+      properties:
+        id:
+          description: message uuid
+          type: string
+          format: uuid
+        order_id:
+          description: message order id
+          type: string
+          format: uuid
+        is_first:
+          type: boolean
+        quest_task_type_id:
+          description: message type id
+          type: string
+        data:
+          type: object
+          $ref: "#/components/schemas/AttachmentData"
+          description: message data
+        author:
+          description: bot or user
+          type: string
+        character_id:
+          description: message character id
+          type: string
+          format: uuid
+        attachment_id:
+          description: "list of attachments' ids"
+          type: array
+          items:
+            type: string
+            format: uuid
+    CityInputAdminMessage:
+      type: object
+      required: [id, order_id, is_first, quest_task_type_id, data, author]
+      properties:
+        id:
+          description: message uuid
+          type: string
+          format: uuid
+        order_id:
+          description: message order id
+          type: string
+          format: uuid
+        is_first:
+          type: boolean
+        quest_task_type_id:
+          description: message type id
+          type: string
+        data:
+          type: object
+          $ref: "#/components/schemas/CityInputData"
+          description: message data
+        author:
+          description: bot or user
+          type: string
+        character_id:
+          description: message character id
+          type: string
+          format: uuid
+    KeyboardAdminMessage:
+      type: object
+      required: [id, order_id, is_first, quest_task_type_id, data, author]
+      properties:
+        id:
+          description: message uuid
+          type: string
+          format: uuid
+        order_id:
+          description: message order id
+          type: string
+          format: uuid
+        is_first:
+          type: boolean
+        quest_task_type_id:
+          description: message type id
+          type: string
+        data:
+          type: object
+          $ref: "#/components/schemas/KeyboardData"
+          description: message data
+        author:
+          description: bot or user
+          type: string
+        character_id:
+          description: message character id
+          type: string
+          format: uuid
+    ActionCardAdminMessage:
+      type: object
+      required: [id, order_id, is_first, quest_task_type_id, data, author]
+      properties:
+        id:
+          description: message uuid
+          type: string
+          format: uuid
+        order_id:
+          description: message order id
+          type: string
+          format: uuid
+        is_first:
+          type: boolean
+        quest_task_type_id:
+          description: message type id
+          type: string
+        data:
+          type: object
+          $ref: "#/components/schemas/ActionCardData"
+          description: message data
+        author:
+          description: bot or user
+          type: string
+        character_id:
+          description: message character id
+          type: string
+          format: uuid
+        attachment_id:
+          description: "list of (only 1 image attachment)"
+          type: array
+          items:
+            type: string
+            format: uuid
+    TextAdminMessageDetailed:
+      type: object
+      required:
+        [
+          id,
+          quest_id,
+          order_id,
+          is_first,
+          quest_task_type_id,
+          data,
+          author,
+          type,
+        ]
+      properties:
+        id:
+          description: message uuid
+          type: string
+          format: uuid
+        quest_id:
+          description: message quest id
+          type: string
+          format: uuid
+        order_id:
+          description: message order id
+          type: string
+          format: uuid
+        is_first:
+          type: boolean
+        quest_task_type_id:
+          description: message type id
+          type: string
+        type:
+          description: message type
+          type: string
+        data:
+          type: object
+          $ref: "#/components/schemas/TextData"
+          description: message data
+        author:
+          description: bot or user
+          type: string
+        character_id:
+          description: message character id
+          type: string
+          format: uuid
+        character:
+          description: message author
+          $ref: "#/components/schemas/Character"
+          type: object
+    AttachmentAdminMessageDetailed:
+      type: object
+      required:
+        [
+          id,
+          quest_id,
+          order_id,
+          is_first,
+          quest_task_type_id,
+          data,
+          author,
+          type,
+          attachments,
+        ]
+      properties:
+        id:
+          description: message uuid
+          type: string
+          format: uuid
+        quest_id:
+          description: message quest id
+          type: string
+          format: uuid
+        order_id:
+          description: message order id
+          type: string
+          format: uuid
+        is_first:
+          type: boolean
+        quest_task_type_id:
+          description: message type id
+          type: string
+        type:
+          description: message type
+          type: string
+        data:
+          type: object
+          $ref: "#/components/schemas/AttachmentData"
+          description: message data
+        author:
+          description: bot or user
+          type: string
+        character_id:
+          description: message character id
+          type: string
+          format: uuid
+        character:
+          description: message author
+          $ref: "#/components/schemas/Character"
+          type: object
+        attachments:
+          description: "list of attachments"
+          type: array
+          items:
+            $ref: "#/components/schemas/Attachment"
+    CityInputAdminMessageDetailed:
+      type: object
+      required:
+        [
+          id,
+          quest_id,
+          order_id,
+          is_first,
+          quest_task_type_id,
+          data,
+          author,
+          type,
+        ]
+      properties:
+        id:
+          description: message uuid
+          type: string
+          format: uuid
+        quest_id:
+          description: message quest id
+          type: string
+          format: uuid
+        order_id:
+          description: message order id
+          type: string
+          format: uuid
+        is_first:
+          type: boolean
+        quest_task_type_id:
+          description: message type id
+          type: string
+        type:
+          description: message type
+          type: string
+        data:
+          type: object
+          $ref: "#/components/schemas/CityInputData"
+          description: message data
+        author:
+          description: bot or user
+          type: string
+        character_id:
+          description: message character id
+          type: string
+          format: uuid
+        character:
+          description: message author
+          $ref: "#/components/schemas/Character"
+          type: object
+    KeyboardAdminMessageDetailed:
+      type: object
+      required:
+        [
+          id,
+          quest_id,
+          order_id,
+          is_first,
+          quest_task_type_id,
+          data,
+          author,
+          type,
+        ]
+      properties:
+        id:
+          description: message uuid
+          type: string
+          format: uuid
+        quest_id:
+          description: message quest id
+          type: string
+          format: uuid
+        order_id:
+          description: message order id
+          type: string
+          format: uuid
+        is_first:
+          type: boolean
+        quest_task_type_id:
+          description: message type id
+          type: string
+        type:
+          description: message type
+          type: string
+        data:
+          type: object
+          $ref: "#/components/schemas/KeyboardData"
+          description: message data
+        author:
+          description: bot or user
+          type: string
+        character_id:
+          description: message character id
+          type: string
+          format: uuid
+        character:
+          description: message author
+          $ref: "#/components/schemas/Character"
+          type: object
+    ActionCardAdminMessageDetailed:
+      type: object
+      required:
+        [
+          id,
+          quest_id,
+          order_id,
+          is_first,
+          quest_task_type_id,
+          data,
+          author,
+          type,
+          attachments,
+        ]
+      properties:
+        id:
+          description: message uuid
+          type: string
+          format: uuid
+        quest_id:
+          description: message quest id
+          type: string
+          format: uuid
+        order_id:
+          description: message order id
+          type: string
+          format: uuid
+        is_first:
+          type: boolean
+        quest_task_type_id:
+          description: message type id
+          type: string
+        type:
+          description: message type
+          type: string
+        data:
+          type: object
+          $ref: "#/components/schemas/ActionCardData"
+          description: message data
+        author:
+          description: bot or user
+          type: string
+        character_id:
+          description: message character id
+          type: string
+          format: uuid
+        character:
+          description: message author
+          $ref: "#/components/schemas/Character"
+          type: object
+        attachments:
+          description: "list of attachments (only 1 image)"
+          type: array
+          items:
+            $ref: "#/components/schemas/Attachment"
+    QuestGlobal:
+      type: object
+      properties:
+        id:
+          description: quest uuid
+          type: string
+          format: uuid
+        user_id:
+          description: creator uuid
+          type: string
+          format: uuid
+        name:
+          description: quest name
+          type: string
+        is_available:
+          description: is quest available for clients
+          type: boolean
+        public_beautiful_name:
+          description: quest beautiful name
+          type: string
+    Quest:
+      type: object
+      properties:
+        id:
+          description: quest uuid
+          type: string
+          format: uuid
+        user_id:
+          description: creator uuid
+          type: string
+          format: uuid
+        name:
+          description: quest name
+          type: string
+        is_available:
+          description: is quest available for clients
+          type: boolean
+        public_beautiful_name:
+          description: quest beautiful name
+          type: string
+        messages:
+          description: quest task messages
+          type: array
+          items:
+            anyOf:
+              - $ref: "#/components/schemas/TextAdminMessage"
+              - $ref: "#/components/schemas/AttachmentAdminMessage"
+              - $ref: "#/components/schemas/CityInputAdminMessage"
+              - $ref: "#/components/schemas/KeyboardAdminMessage"
+              - $ref: "#/components/schemas/ActionCardAdminMessage"
+    QuestDetailed:
+      type: object
+      properties:
+        id:
+          description: quest uuid
+          type: string
+          format: uuid
+        user_id:
+          description: creator uuid
+          type: string
+          format: uuid
+        name:
+          description: quest name
+          type: string
+        is_available:
+          description: is quest available for clients
+          type: boolean
+        public_beautiful_name:
+          description: quest beautiful name
+          type: string
+        messages:
+          description: quest task messages
+          type: array
+          items:
+            anyOf:
+              - $ref: "#/components/schemas/TextAdminMessageDetailed"
+              - $ref: "#/components/schemas/AttachmentAdminMessageDetailed"
+              - $ref: "#/components/schemas/CityInputAdminMessageDetailed"
+              - $ref: "#/components/schemas/KeyboardAdminMessageDetailed"
+              - $ref: "#/components/schemas/ActionCardAdminMessageDetailed"
+
+  securitySchemes:
+    UserTicketAuth:
+      type: http
+      scheme: Bearer

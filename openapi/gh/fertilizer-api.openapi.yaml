@@ -1,0 +1,22 @@
+import { defineEventHandler, setHeader } from 'h3'
+import { readFile } from 'fs/promises'
+import { resolve } from 'path'
+
+export default defineEventHandler(async (event) => {
+  try {
+    // YAMLãã¡ã¤ã«ãèª­ã¿è¾¼ã¿
+    const yamlPath = resolve(process.cwd(), 'api-spec.yaml')
+    const yamlContent = await readFile(yamlPath, 'utf-8')
+    
+    // YAMLå½¢å¼ã®ã¬ã¹ãã³ã¹ãããã¼ãè¨­å®
+    setHeader(event, 'Content-Type', 'application/x-yaml')
+    setHeader(event, 'Access-Control-Allow-Origin', '*')
+    
+    return yamlContent
+  } catch (error) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'OpenAPI specification not found'
+    })
+  }
+})

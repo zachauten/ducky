@@ -1,0 +1,212 @@
+openapi: 3.0.3
+
+#  This file is part of the Eliona project.
+#  Copyright Â© 2024 IoTEC AG. All Rights Reserved.
+#  ______ _ _
+# |  ____| (_)
+# | |__  | |_  ___  _ __   __ _
+# |  __| | | |/ _ \| '_ \ / _` |
+# | |____| | | (_) | | | | (_| |
+# |______|_|_|\___/|_| |_|\__,_|
+#
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+#  BUT NOT LIMITED  TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+#  NON INFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+#  DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+info:
+  version: 1.0.0
+  title: Device Simulator app API
+  description: API to access and configure the Device Simulator app
+externalDocs:
+  description: Find out more about the Device Simulator app
+  url: https://doc.eliona.io/collection/v/eliona-english/eliona-apps/apps/device-simulator
+servers:
+  - url: "https://{server}/v1"
+    variables:
+      server:
+        default: device-simulator
+  - url: "https://{environment}.eliona.io/apps/device-simulator/api/v1"
+    variables:
+      environment:
+        default: name
+
+tags:
+  - name: Configuration
+    description: Configure the app
+    externalDocs:
+      url: https://github.com/eliona-smart-building-assistant/device-simulator-app
+
+  - name: Version
+    description: API version
+    externalDocs:
+      url: https://github.com/eliona-smart-building-assistant/device-simulator-app
+
+paths:
+  /generators:
+    get:
+      tags:
+        - Configuration
+      summary: List all generators
+      responses:
+        "200":
+          description: A list of generators
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Generator"
+    post:
+      tags:
+        - Configuration
+      summary: Create a new generator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Generator"
+      responses:
+        "201":
+          description: Generator created
+  /generators/{id}:
+    get:
+      tags:
+        - Configuration
+      summary: Get a generator by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: A single generator
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Generator"
+        "404":
+          description: Generator not found
+    put:
+      tags:
+        - Configuration
+      summary: Update a generator by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Generator"
+      responses:
+        "200":
+          description: Generator updated
+        "404":
+          description: Generator not found
+    delete:
+      tags:
+        - Configuration
+      summary: Delete a generator by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Generator deleted
+        "404":
+          description: Generator not found
+
+  /version:
+    get:
+      summary: Version of the API
+      description: Gets information about the APIs version.
+      operationId: getVersion
+      tags:
+        - Version
+      responses:
+        "200":
+          description: Successfully returned the APIs version.
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /version/openapi.json:
+    get:
+      summary: OpenAPI specification for this API version
+      description: Gets specification for this API version as an openapi.json file.
+      operationId: getOpenAPI
+      tags:
+        - Version
+      responses:
+        "200":
+          description: Successfully returned the openapi.json file.
+          content:
+            application/json:
+              schema:
+                type: object
+
+components:
+  parameters:
+    config-id:
+      name: config-id
+      in: path
+      description: The id of the config
+      example: 4711
+      required: true
+      schema:
+        type: integer
+        format: int64
+        example: 4711
+
+  schemas:
+    Generator:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        tenant_id:
+          type: string
+        asset_id:
+          type: integer
+        attribute:
+          type: string
+        subtype:
+          type: string
+        function_type:
+          type: string
+          enum:
+            - random
+            - sin_wave
+            - sawtooth_wave
+        min_value:
+          type: number
+          format: double
+        max_value:
+          type: number
+          format: double
+        integer:
+          type: boolean
+          description: Specifies whether the returned number should be an integer or a rational number.
+        interval_seconds:
+          type: double
+        frequency:
+          type: number
+          format: double
+      required:
+        - asset_id
+        - attribute
+        - function_type

@@ -1,0 +1,398 @@
+openapi: 3.0.0
+info:
+  title: med-information
+  version: 0.0.1
+  description: Module for medication information
+  contact:
+    name: gmej
+    email: gmejias97@gmail.com
+servers:
+  - url: https://fosps.gravitatehealth.eu
+paths:
+  /med-informations/count:
+    get:
+      x-controller-name: MedInformationController
+      x-operation-name: count
+      tags:
+        - MedInformationController
+      responses:
+        "200":
+          description: MedInformation model count
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/loopback.Count"
+      parameters:
+        - name: where
+          in: query
+          content:
+            application/json:
+              schema:
+                type: object
+                title: MedInformation.WhereFilter
+                additionalProperties: true
+                x-typescript-type: "@loopback/repository#Where<MedInformation>"
+      operationId: MedInformationController.count
+  /med-informations/{id}:
+    post:
+      x-controller-name: MedInformationController
+      x-operation-name: focusById
+      tags:
+        - MedInformationController
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: MedInformation focused model instance
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+        - name: filter
+          in: query
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MedInformation.Filter"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        x-parameter-index: 1
+      operationId: MedInformationController.focusById
+    put:
+      x-controller-name: MedInformationController
+      x-operation-name: replaceById
+      tags:
+        - MedInformationController
+      responses:
+        "204":
+          description: No Content
+          content:
+            application/json:
+              schema:
+                description: MedInformation PUT success
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MedInformation"
+        x-parameter-index: 1
+      operationId: MedInformationController.replaceById
+    get:
+      x-controller-name: MedInformationController
+      x-operation-name: findById
+      tags:
+        - MedInformationController
+      responses:
+        "200":
+          description: MedInformation model instance
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MedInformationWithRelations"
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+        - name: filter
+          in: query
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MedInformation.Filter"
+      operationId: MedInformationController.findById
+    delete:
+      x-controller-name: MedInformationController
+      x-operation-name: deleteById
+      tags:
+        - MedInformationController
+      responses:
+        "204":
+          description: No Content
+          content:
+            application/json:
+              schema:
+                description: MedInformation DELETE success
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      operationId: MedInformationController.deleteById
+  /med-informations:
+    post:
+      x-controller-name: MedInformationController
+      x-operation-name: create
+      tags:
+        - MedInformationController
+      responses:
+        "200":
+          description: MedInformation model instance
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MedInformation"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewMedInformation"
+      operationId: MedInformationController.create
+    patch:
+      x-controller-name: MedInformationController
+      x-operation-name: updateAll
+      tags:
+        - MedInformationController
+      responses:
+        "200":
+          description: MedInformation PATCH success count
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/loopback.Count"
+      parameters:
+        - name: where
+          in: query
+          content:
+            application/json:
+              schema:
+                type: object
+                title: MedInformation.WhereFilter
+                additionalProperties: true
+                x-typescript-type: "@loopback/repository#Where<MedInformation>"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MedInformationPartial"
+      operationId: MedInformationController.updateAll
+    get:
+      x-controller-name: MedInformationController
+      x-operation-name: find
+      tags:
+        - MedInformationController
+      responses:
+        "200":
+          description: Array of MedInformation model instances
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MedInformationWithRelations"
+      parameters:
+        - name: filter
+          in: query
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MedInformation.Filter1"
+      operationId: MedInformationController.find
+components:
+  schemas:
+    MedInformation:
+      title: MedInformation
+      type: object
+      properties:
+        internalId:
+          type: string
+        id:
+          type: string
+        code: {}
+        status:
+          type: string
+        marketingAuthorizationHolder: {}
+        doseForm: {}
+        totalVolume: {}
+        ingredient: {}
+        batch: {}
+      required:
+        - id
+      additionalProperties: true
+    NewMedInformation:
+      title: NewMedInformation
+      type: object
+      description: "(tsType: Omit<MedInformation, 'internalId'>, schemaOptions: { title: 'NewMedInformation', exclude: [ 'internalId' ] })"
+      properties:
+        id:
+          type: string
+        code: {}
+        status:
+          type: string
+        marketingAuthorizationHolder: {}
+        doseForm: {}
+        totalVolume: {}
+        ingredient: {}
+        batch: {}
+      required:
+        - id
+      additionalProperties: true
+      x-typescript-type: Omit<MedInformation, 'internalId'>
+    MedInformationWithRelations:
+      title: MedInformationWithRelations
+      type: object
+      description: "(tsType: MedInformationWithRelations, schemaOptions: { includeRelations: true })"
+      properties:
+        internalId:
+          type: string
+        id:
+          type: string
+        code: {}
+        status:
+          type: string
+        marketingAuthorizationHolder: {}
+        doseForm: {}
+        totalVolume: {}
+        ingredient: {}
+        batch: {}
+      required:
+        - id
+      additionalProperties: true
+      x-typescript-type: MedInformationWithRelations
+    MedInformationPartial:
+      title: MedInformationPartial
+      type: object
+      description: "(tsType: Partial<MedInformation>, schemaOptions: { partial: true })"
+      properties:
+        internalId:
+          type: string
+        id:
+          type: string
+        code: {}
+        status:
+          type: string
+        marketingAuthorizationHolder: {}
+        doseForm: {}
+        totalVolume: {}
+        ingredient: {}
+        batch: {}
+      additionalProperties: true
+      x-typescript-type: Partial<MedInformation>
+    loopback.Count:
+      type: object
+      title: loopback.Count
+      x-typescript-type: "@loopback/repository#Count"
+      properties:
+        count:
+          type: number
+    MedInformation.Filter:
+      type: object
+      title: MedInformation.Filter
+      properties:
+        offset:
+          type: integer
+          minimum: 0
+        limit:
+          type: integer
+          minimum: 1
+          example: 100
+        skip:
+          type: integer
+          minimum: 0
+        order:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+        fields:
+          oneOf:
+            - type: object
+              properties:
+                internalId:
+                  type: boolean
+                id:
+                  type: boolean
+                code:
+                  type: boolean
+                status:
+                  type: boolean
+                marketingAuthorizationHolder:
+                  type: boolean
+                doseForm:
+                  type: boolean
+                totalVolume:
+                  type: boolean
+                ingredient:
+                  type: boolean
+                batch:
+                  type: boolean
+              additionalProperties: true
+            - type: array
+              items:
+                type: string
+                example: internalId
+              uniqueItems: true
+          title: MedInformation.Fields
+      additionalProperties: false
+      x-typescript-type: "@loopback/repository#Filter<MedInformation>"
+    MedInformation.Filter1:
+      type: object
+      title: MedInformation.Filter
+      properties:
+        offset:
+          type: integer
+          minimum: 0
+        limit:
+          type: integer
+          minimum: 1
+          example: 100
+        skip:
+          type: integer
+          minimum: 0
+        order:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+        where:
+          title: MedInformation.WhereFilter
+          type: object
+          additionalProperties: true
+        fields:
+          oneOf:
+            - type: object
+              properties:
+                internalId:
+                  type: boolean
+                id:
+                  type: boolean
+                code:
+                  type: boolean
+                status:
+                  type: boolean
+                marketingAuthorizationHolder:
+                  type: boolean
+                doseForm:
+                  type: boolean
+                totalVolume:
+                  type: boolean
+                ingredient:
+                  type: boolean
+                batch:
+                  type: boolean
+              additionalProperties: true
+            - type: array
+              items:
+                type: string
+                example: internalId
+              uniqueItems: true
+          title: MedInformation.Fields
+      additionalProperties: false
+      x-typescript-type: "@loopback/repository#Filter<MedInformation>"

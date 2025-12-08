@@ -1,0 +1,107 @@
+openapi: 3.0.0
+info:
+  title: Sample
+  version: 1.0.0
+servers:
+  - url: http://{{endpoint}}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+paths:
+  /e/ingest/events/v2:
+    post:
+      tags:
+        - default
+      summary: Ingestion V2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                data:
+                  events:
+                    - name: Schedule Delivery
+                      timestamp: 1683009771000
+                      kvs:
+                        - key: ID
+                          value:
+                            string_value: '13432'
+                        - key: City
+                          value:
+                            string_value: BLR
+                        - key: IS_COD
+                          value:
+                            bool_value: false
+                    - name: Schedule Change
+                      timestamp: 1683009771000
+                      kvs:
+                        - key: ID1
+                          value:
+                            string_value: '13432'
+                        - key: City2
+                          value:
+                            string_value: BLR
+                        - key: IS_COD3
+                          value:
+                            bool_value: false
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: X-REQUEST-ORG
+          in: header
+          schema:
+            type: string
+          example: '{{org}}'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Date:
+              schema:
+                type: string
+                example: Sat, 25 Feb 2023 05:59:47 GMT
+            Server:
+              schema:
+                type: string
+                example: WSGIServer/0.2 CPython/3.9.16
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+            Vary:
+              schema:
+                type: string
+                example: Accept, Origin
+            Allow:
+              schema:
+                type: string
+                example: OPTIONS, POST
+            X-Frame-Options:
+              schema:
+                type: string
+                example: DENY
+            Content-Length:
+              schema:
+                type: integer
+                example: '14'
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            Referrer-Policy:
+              schema:
+                type: string
+                example: same-origin
+            Cross-Origin-Opener-Policy:
+              schema:
+                type: string
+                example: same-origin
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                count: '1'

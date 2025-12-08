@@ -1,0 +1,286 @@
+openapi: 3.0.3
+info:
+  title: symfony-starter-kit/admin
+  version: 1.0.0
+tags:
+  - name: {{ tagName }}
+    description: ÐÐ´Ð¼Ð¸Ð½ÐºÐ° / {{ name }} #todo ÐÐ°ÑÑ Ð¸Ð¼Ñ ÑÐµÐ³Ñ
+paths:
+  {{ uri }}:
+    get:
+      operationId: {{ listName }}
+      summary: ÐÐ¾Ð»ÑÑÐµÐ½Ð¸Ðµ ÑÐ¿Ð¸ÑÐºÐ° {{ name }} #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+      description: ÐÐ¾Ð»ÑÑÐµÐ½Ð¸Ðµ ÑÐ¿Ð¸ÑÐºÐ° {{ name }} #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+      tags:
+        - {{ tagName }}
+      security:
+        - adminHttpAuth: [ ]
+      responses:
+        '200':
+          $ref: '#/components/responses/{{ listName }}'
+        '401':
+          $ref: '../common.yaml#/components/responses/authRequired'
+        '403':
+          $ref: '../common.yaml#/components/responses/forbidden'
+    post:
+      operationId: {{ createName }}
+      summary: Ð¡Ð¾Ð·Ð´Ð°Ð½Ð¸Ðµ {{ name }} #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+      description: Ð¡Ð¾Ð·Ð´Ð°Ð½Ð¸Ðµ {{ name }} #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+      tags:
+        - {{ tagName }}
+      security:
+        - adminHttpAuth: [ ]
+      requestBody:
+        $ref: '#/components/requestBodies/{{ createName }}'
+      responses:
+        '200':
+          $ref: '#/components/responses/{{ createName }}'
+        '400':
+          $ref: '../common.yaml#/components/responses/invalidRequest'
+        '401':
+          $ref: '../common.yaml#/components/responses/authRequired'
+        '403':
+          $ref: '../common.yaml#/components/responses/forbidden'
+  {{ uri }}/{id}:
+    get:
+      operationId: {{ infoName }}
+      summary: ÐÑÐ¾ÑÐ¼Ð¾ÑÑ {{ name }} #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+      description: ÐÑÐ¾ÑÐ¼Ð¾ÑÑ {{ name }} #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+      tags:
+        - {{ tagName }}
+      security:
+        - adminHttpAuth: [ ]
+      parameters:
+        - in: path
+          name: id
+          schema:
+            $ref: '#/components/schemas/{{ id }}'
+          required: true
+          description: Id {{ name }} #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+      responses:
+        '200':
+          $ref: '#/components/responses/{{ infoName }}'
+        '401':
+          $ref: '../common.yaml#/components/responses/authRequired'
+        '403':
+          $ref: '../common.yaml#/components/responses/forbidden'
+        '404':
+          $ref: '../common.yaml#/components/responses/notFound'
+    put:
+      operationId: {{ updateName }}
+      summary: ÐÐ±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð´Ð°Ð½Ð½ÑÑ {{ name }} #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+      description: ÐÐ±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð´Ð°Ð½Ð½ÑÑ {{ name }} #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+      tags:
+        - {{ tagName }}
+      security:
+        - adminHttpAuth: [ ]
+      parameters:
+        - in: path
+          name: id
+          schema:
+            $ref: '#/components/schemas/{{ id }}'
+          required: true
+          description: Id {{ name }} #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+      requestBody:
+        $ref: '#/components/requestBodies/{{ updateName }}'
+      responses:
+        '200':
+          $ref: '#/components/responses/{{ updateName }}'
+        '400':
+          $ref: '../common.yaml#/components/responses/invalidRequest'
+        '401':
+          $ref: '../common.yaml#/components/responses/authRequired'
+        '403':
+          $ref: '../common.yaml#/components/responses/forbidden'
+        '404':
+          $ref: '../common.yaml#/components/responses/notFound'
+    delete:
+      operationId: {{ deleteName }}
+      summary: Ð£Ð´Ð°Ð»ÐµÐ½Ð¸Ðµ {{ name }} #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+      description: Ð£Ð´Ð°Ð»ÐµÐ½Ð¸Ðµ {{ name }} #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+      tags:
+        - {{ tagName }}
+      security:
+        - adminHttpAuth: [ ]
+      parameters:
+        - in: path
+          name: id
+          schema:
+            $ref: '#/components/schemas/{{ id }}'
+          required: true
+          description: Id {{ name }} #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+      responses:
+        '200':
+          $ref: '../common.yaml#/components/responses/success'
+        '401':
+          $ref: '../common.yaml#/components/responses/authRequired'
+        '403':
+          $ref: '../common.yaml#/components/responses/forbidden'
+        '404':
+          $ref: '../common.yaml#/components/responses/notFound'
+components:
+  requestBodies:
+    {{ createName }}:
+      description: ÐÐ°Ð¿ÑÐ¾Ñ Ð½Ð° ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ {{ name }} #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+{% for field in fields %}
+              - {{ field.propertyName }}
+{% endfor  %}
+            additionalProperties: false
+            properties:
+{% for field in fields %}
+              {{ field.propertyName }}:
+                type: string
+                minLength: 1
+{% if field.nullable %}
+                nullable: true
+{% endif %}
+                description: ÐÐ¿Ð¸ÑÐ°Ð½Ð¸Ðµ {{ field.propertyName }} #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+                example: ÐÑÐ¸Ð¼ÐµÑ {{ field.propertyName }} #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+{% endfor  %}
+    {{ updateName }}:
+      description: ÐÐ°Ð¿ÑÐ¾Ñ Ð½Ð° Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ {{ name }} #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+{% for field in fields %}
+              - {{ field.propertyName }}
+{% endfor  %}
+            additionalProperties: false
+            properties:
+{% for field in fields %}
+              {{ field.propertyName }}:
+                type: string
+                minLength: 1
+{% if field.nullable %}
+                nullable: true
+{% endif %}
+                description: ÐÐ¿Ð¸ÑÐ°Ð½Ð¸Ðµ {{ field.propertyName }} #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+                example: ÐÑÐ¸Ð¼ÐµÑ {{ field.propertyName }} #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+{% endfor  %}
+  responses:
+    {{ listName }}:
+      description: Ð¡Ð¿Ð¸ÑÐ¾Ðº {{ name }} #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+              - pagination
+              - meta
+              - status
+            additionalProperties: false
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/{{ infoName }}'
+              pagination:
+                $ref: '../common.yaml#/components/schemas/pagination'
+              meta:
+                type: object
+                nullable: true
+              status:
+                $ref: '../common.yaml#/components/schemas/succeedStatus'
+      headers:
+        X-Request-TraceId:
+          $ref: '../common.yaml#/components/headers/requestTraceId'
+    {{ createName }}:
+      description: {{ name }} ÑÐ¾Ð·Ð´Ð°Ð½ #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - description: ÐÐ°Ð½Ð½ÑÐµ {{ name }} #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+                type: object
+                required:
+                  - data
+                  - status
+                additionalProperties: false
+                properties:
+                  data:
+                    $ref: '#/components/schemas/{{ infoName }}'
+                  status:
+                    $ref: '../common.yaml#/components/schemas/succeedStatus'
+              - $ref: '../common.yaml#/components/schemas/error'
+      headers:
+        X-Request-TraceId:
+          $ref: '../common.yaml#/components/headers/requestTraceId'
+    {{ updateName }}:
+      description: {{ name }} Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½ #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - description: ÐÐ°Ð½Ð½ÑÐµ {{ name }} #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+                type: object
+                required:
+                  - data
+                  - status
+                additionalProperties: false
+                properties:
+                  data:
+                    $ref: '#/components/schemas/{{ infoName }}'
+                  status:
+                    $ref: '../common.yaml#/components/schemas/succeedStatus'
+              - $ref: '../common.yaml#/components/schemas/error'
+      headers:
+        X-Request-TraceId:
+          $ref: '../common.yaml#/components/headers/requestTraceId'
+    {{ infoName }}:
+      description: ÐÐ°Ð½Ð½ÑÐµ {{ name }} #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+              - status
+            additionalProperties: false
+            properties:
+              data:
+                $ref: '#/components/schemas/{{ infoName }}'
+              status:
+                $ref: '../common.yaml#/components/schemas/succeedStatus'
+      headers:
+        X-Request-TraceId:
+          $ref: '../common.yaml#/components/headers/requestTraceId'
+  schemas:
+    {{ id }}:
+      type: string
+      format: uuid
+      description: Id {{ name }}
+      example: 0193499c-388e-752c-93ca-4c5fa3b9179c
+    {{ infoName }}:
+      description: ÐÐ°Ð½Ð½ÑÐµ {{ name }} #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+      type: object
+      required:
+        - id
+{% for field in fields %}
+        - {{ field.propertyName }}
+{% endfor  %}
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          $ref: '#/components/schemas/{{ id }}'
+{% for field in fields %}
+        {{ field.propertyName }}:
+          type: string
+          description: ÐÐ¿Ð¸ÑÐ°Ð½Ð¸Ðµ {{ field.propertyName }} #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+{% if field.nullable %}
+          nullable: true
+{% endif %}
+          example: ÐÑÐ¸Ð¼ÐµÑ {{ field.propertyName }} #todo Ð¿Ð¾Ð¼ÐµÐ½ÑÑÑ
+{% endfor  %}
+        createdAt:
+          $ref: '../common.yaml#/components/schemas/createdAt'
+        updatedAt:
+          $ref: '../common.yaml#/components/schemas/updatedAt'

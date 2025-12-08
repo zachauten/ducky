@@ -1,0 +1,926 @@
+openapi: 3.0.3
+info:
+  title: Nova ä¿¡æ¯æµ API
+  version: 1.0.0
+  description: >-
+    é¢ååä½ä¸ Mock çå¥çº¦ãç»ä¸ååºç»æï¼{"code", "msg", "data", "trace_id?"}
+servers:
+  - url: http://localhost:4010
+    description: æ¬å° Mock æå¡å¨ï¼Prism ç¤ºä¾ç«¯å£ï¼
+  - url: http://localhost:8000
+    description: æ¬å°å¼åæå¡å¨ï¼FastAPI ç¤ºä¾ç«¯å£ï¼
+
+paths:
+  /api/v1/docs:
+    get:
+      summary: è·åææ¡£åè¡¨
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: size
+          schema: { type: integer, default: 20 }
+        - in: query
+          name: tag
+          schema: { type: string }
+        - in: query
+          name: source
+          schema: { type: string, enum: [yuque, wechat, qq, web] }
+        - in: query
+          name: sort
+          schema: { type: string, example: "created_at:desc" }
+        - in: query
+          name: fields
+          schema: { type: string, example: "id,title,summary" }
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StdListResponseDoc'
+              examples:
+                default:
+                  $ref: '#/components/examples/DocListSuccess'
+    post:
+      summary: æ°å¢ææ¡£
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDocRequest'
+            examples:
+              default:
+                $ref: '#/components/examples/CreateDocRequest'
+      responses:
+        '201':
+          description: created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StdCreatedId'
+              examples:
+                default:
+                  value: { code: 201, msg: created, data: { id: "doc_123" } }
+
+  /api/v1/docs/{id}:
+    get:
+      summary: è·ååä¸ªææ¡£
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StdResponseDoc'
+              examples:
+                default:
+                  $ref: '#/components/examples/DocDetailSuccess'
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StdError' }
+              examples:
+                notFound:
+                  value: { code: 404, msg: not found, data: null }
+    put:
+      summary: æ´æ°ææ¡£ï¼æ´ä½ï¼
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateDocRequest' }
+      responses:
+        '200':
+          description: updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StdUpdatedId' }
+    delete:
+      summary: å é¤ææ¡£
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: deleted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StdDeleted' }
+
+  /api/v1/preprocess/clean:
+    post:
+      summary: ææ¬æ¸æ´
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PreprocessCleanRequest' }
+            examples:
+              default:
+                $ref: '#/components/examples/PreprocessCleanRequest'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PreprocessCleanResponse' }
+
+  /api/v1/preprocess/dedup:
+    post:
+      summary: å»éæ£æµ
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PreprocessDedupRequest' }
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PreprocessDedupResponse' }
+
+  /api/v1/preprocess/tags:
+    post:
+      summary: åè¯ä¸æ ç­¾æå
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PreprocessTagsRequest' }
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PreprocessTagsResponse' }
+
+  /api/v1/ai/summary:
+    post:
+      summary: çææè¦
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AiSummaryRequest' }
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AiSummaryResponse' }
+
+  /api/v1/ai/classify:
+    post:
+      summary: ææ¬åç±»
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AiClassifyRequest' }
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AiClassifyResponse' }
+
+  /api/v1/ai/recognize:
+    post:
+      summary: å¾ç/è¡¨æ ¼/å¬å¼è¯å«
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AiRecognizeRequest' }
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AiRecognizeResponse' }
+
+  /api/v1/push/webhook:
+    post:
+      summary: æ¨éå° Webhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/WebhookPushRequest' }
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StdOk' }
+
+  /api/v1/push/rss:
+    get:
+      summary: çæ RSSï¼ç¤ºæï¼ä¸å¨ Mock è¿å XMLï¼
+      parameters:
+        - in: query
+          name: tag
+          schema: { type: string }
+      responses:
+        '200':
+          description: xml feed
+          content:
+            application/xml:
+              schema:
+                type: string
+              example: |
+                <?xml version="1.0" encoding="UTF-8" ?>
+                <rss><channel><title>Nova Feed</title></channel></rss>
+
+  /api/v1/push/email:
+    post:
+      summary: é®ä»¶æ¨é
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EmailPushRequest' }
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StdOk' }
+
+  /api/v1/stream:
+    get:
+      summary: è·åä¿¡æ¯æµ
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: size
+          schema: { type: integer, default: 20 }
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StdListResponseStreamItem' }
+
+  /api/v1/search:
+    get:
+      summary: æ£ç´¢ï¼ç­æ¥è¯¢ï¼
+      parameters:
+        - in: query
+          name: q
+          schema: { type: string }
+        - in: query
+          name: tag
+          schema: { type: string }
+        - in: query
+          name: mode
+          schema: { type: string, enum: [vector, precise, hybrid] }
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StdListResponseSearchItem' }
+
+  /api/v1/views/{id}:
+    get:
+      summary: è·åä¿å­çè§å¾
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ViewResponse' }
+              examples:
+                default:
+                  value:
+                    code: 200
+                    msg: success
+                    data:
+                      id: view_001
+                      name: æè¿éç¥
+                      query: { tag: "éç¥", sort: "created_at:desc" }
+
+  /api/v1/bot/send:
+    post:
+      summary: Bot åéæ¶æ¯
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BotSendRequest' }
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StdOk' }
+
+  /graphql:
+    post:
+      summary: GraphQL ç«¯ç¹ï¼æ¯ææ¥è¯¢åæ£ç´¢ï¼
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query: { type: string }
+                variables: { type: object, additionalProperties: true }
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+              examples:
+                default:
+                  value:
+                    data:
+                      stream:
+                        items:
+                          - { id: "doc_1", title: "A" }
+                          - { id: "doc_2", title: "B" }
+
+  /api/v1/imports:
+    post:
+      summary: æäº¤å¯¼å¥ä½ä¸
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ImportJobRequest' }
+            examples:
+              default:
+                $ref: '#/components/examples/ImportJobRequest'
+      responses:
+        '201':
+          description: created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StdCreatedJob' }
+
+  /api/v1/imports/{job_id}:
+    get:
+      summary: æ¥è¯¢å¯¼å¥ä½ä¸
+      parameters:
+        - in: path
+          name: job_id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ImportJobStatus' }
+
+  /api/v1/docs/{doc_id}/versions:
+    get:
+      summary: è·åææ¡£çåå²çæ¬åè¡¨
+      parameters:
+        - in: path
+          name: doc_id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  msg:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      versions:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            version_id:
+                              type: string
+                            message:
+                              type: string
+                            author:
+                              type: string
+                            timestamp:
+                              type: string
+
+  /api/v1/docs/{doc_id}/versions/{commit_hash}:
+    get:
+      summary: è·åææ¡£çç¹å®åå²çæ¬
+      parameters:
+        - in: path
+          name: doc_id
+          required: true
+          schema: { type: string }
+        - in: path
+          name: commit_hash
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  msg:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      content:
+                        type: string
+
+  /api/v1/docs/{doc_id}/diff:
+    get:
+      summary: è·åææ¡£ççæ¬å·®å¼
+      parameters:
+        - in: path
+          name: doc_id
+          required: true
+          schema: { type: string }
+        - in: query
+          name: from_commit
+          required: true
+          schema: { type: string }
+        - in: query
+          name: to_commit
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  msg:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      diff:
+                        type: string
+
+  /api/v1/docs/{doc_id}/revert:
+    post:
+      summary: åæ»ææ¡£å°æå®çæ¬
+      parameters:
+        - in: path
+          name: doc_id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                commit_hash:
+                  type: string
+                message:
+                  type: string
+      responses:
+        '200':
+          description: reverted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  msg:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      new_version:
+                        type: string
+
+components:
+  schemas:
+    StdOk:
+      type: object
+      properties:
+        code: { type: integer, example: 200 }
+        msg: { type: string, example: success }
+        data: { type: object, nullable: true }
+    StdError:
+      type: object
+      properties:
+        code: { type: integer, example: 400 }
+        msg: { type: string, example: bad request }
+        data:
+          type: object
+          nullable: true
+        trace_id: { type: string, example: "f3e0..." }
+    StdCreatedId:
+      type: object
+      properties:
+        code: { type: integer }
+        msg: { type: string }
+        data:
+          type: object
+          properties:
+            id: { type: string }
+    StdUpdatedId:
+      allOf:
+        - $ref: '#/components/schemas/StdOk'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                id: { type: string }
+    StdDeleted:
+      type: object
+      properties:
+        code: { type: integer, example: 200 }
+        msg: { type: string, example: deleted }
+        data: { nullable: true }
+
+    Doc:
+      type: object
+      required: [id, source_id, title, created_at]
+      properties:
+        id: { type: string, example: doc_123 }
+        source_id: { type: string, example: yuque:abc123 }
+        source: { type: string, enum: [yuque, wechat, qq, web] }
+        title: { type: string }
+        content: { type: string }
+        summary: { type: string }
+        tags:
+          type: array
+          items: { type: string }
+        author: { type: string }
+        url: { type: string }
+        avatar: { type: string }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    StreamItem:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        summary: { type: string }
+        tags:
+          type: array
+          items: { type: string }
+        created_at: { type: string, format: date-time }
+
+    CreateDocRequest:
+      type: object
+      required: [title, content, source]
+      properties:
+        title: { type: string }
+        content: { type: string }
+        tags:
+          type: array
+          items: { type: string }
+        source: { type: string }
+    UpdateDocRequest:
+      allOf:
+        - $ref: '#/components/schemas/CreateDocRequest'
+
+    PreprocessCleanRequest:
+      type: object
+      required: [content]
+      properties:
+        content: { type: string }
+    PreprocessCleanResponse:
+      type: object
+      properties:
+        code: { type: integer }
+        msg: { type: string }
+        data:
+          type: object
+          properties:
+            cleaned_content: { type: string }
+
+    PreprocessDedupRequest:
+      type: object
+      required: [content]
+      properties:
+        content: { type: string }
+    PreprocessDedupResponse:
+      type: object
+      properties:
+        code: { type: integer }
+        msg: { type: string }
+        data:
+          type: object
+          properties:
+            is_duplicate: { type: boolean }
+            similar_id: { type: string }
+
+    PreprocessTagsRequest:
+      type: object
+      required: [content]
+      properties:
+        content: { type: string }
+    PreprocessTagsResponse:
+      type: object
+      properties:
+        code: { type: integer }
+        msg: { type: string }
+        data:
+          type: object
+          properties:
+            tags:
+              type: array
+              items: { type: string }
+            keywords:
+              type: array
+              items: { type: string }
+
+    AiSummaryRequest:
+      type: object
+      required: [content]
+      properties:
+        content: { type: string }
+    AiSummaryResponse:
+      type: object
+      properties:
+        code: { type: integer }
+        msg: { type: string }
+        data:
+          type: object
+          properties:
+            summary: { type: string }
+
+    AiClassifyRequest:
+      type: object
+      required: [content]
+      properties:
+        content: { type: string }
+    AiClassifyResponse:
+      type: object
+      properties:
+        code: { type: integer }
+        msg: { type: string }
+        data:
+          type: object
+          properties:
+            category: { type: string, example: éç¥ }
+            confidence: { type: number, format: float, example: 0.95 }
+
+    AiRecognizeRequest:
+      type: object
+      required: [file]
+      properties:
+        file: { type: string, description: base64 æ æä»¶é¾æ¥ }
+    AiRecognizeResponse:
+      type: object
+      properties:
+        code: { type: integer }
+        msg: { type: string }
+        data:
+          type: object
+          properties:
+            type: { type: string, enum: [image, table, formula] }
+            result: { type: object, additionalProperties: true }
+
+    SearchRequest:
+      type: object
+      properties:
+        query: { type: string }
+        category: { type: string }
+        tag: { type: string }
+        mode: { type: string, enum: [vector, precise, hybrid] }
+    SearchItem:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        summary: { type: string }
+        tags:
+          type: array
+          items: { type: string }
+        created_at: { type: string, format: date-time }
+
+    WebhookPushRequest:
+      type: object
+      required: [target_url, payload]
+      properties:
+        target_url: { type: string }
+        payload:
+          type: object
+          additionalProperties: true
+
+    EmailPushRequest:
+      type: object
+      required: [to, subject, content]
+      properties:
+        to: { type: string }
+        subject: { type: string }
+        content: { type: string }
+
+    ImportJobRequest:
+      type: object
+      required: [path, format, schema_version, source]
+      properties:
+        path: { type: string, example: s3://bucket/folder/docs-20251010.ndjson.gz }
+        format: { type: string, enum: [ndjson, parquet] }
+        schema_version: { type: string, example: '1.0.0' }
+        source: { type: string, example: yuque }
+    StdCreatedJob:
+      type: object
+      properties:
+        code: { type: integer, example: 201 }
+        msg: { type: string, example: created }
+        data:
+          type: object
+          properties:
+            job_id: { type: string, example: imp_123 }
+    ImportJobStatus:
+      type: object
+      properties:
+        code: { type: integer, example: 200 }
+        msg: { type: string, example: success }
+        data:
+          type: object
+          properties:
+            status: { type: string, enum: [queued, running, succeeded, failed, partial] }
+            processed: { type: integer, example: 5000 }
+            failed: { type: integer, example: 3 }
+            next_cursor: { type: string, nullable: true }
+
+    ViewResponse:
+      type: object
+      properties:
+        code: { type: integer }
+        msg: { type: string }
+        data:
+          type: object
+          properties:
+            id: { type: string }
+            name: { type: string }
+            query:
+              type: object
+              additionalProperties: true
+
+    BotSendRequest:
+      type: object
+      required: [platform, target, content]
+      properties:
+        platform: { type: string, example: qq }
+        target: { type: string, example: group:123456 }
+        content: { type: string }
+
+    StdResponseDoc:
+      type: object
+      properties:
+        code: { type: integer }
+        msg: { type: string }
+        data: { $ref: '#/components/schemas/Doc' }
+    StdListResponseDoc:
+      type: object
+      properties:
+        code: { type: integer }
+        msg: { type: string }
+        data:
+          type: array
+          items: { $ref: '#/components/schemas/Doc' }
+    StdListResponseStreamItem:
+      type: object
+      properties:
+        code: { type: integer }
+        msg: { type: string }
+        data:
+          type: array
+          items: { $ref: '#/components/schemas/StreamItem' }
+    StdListResponseSearchItem:
+      type: object
+      properties:
+        code: { type: integer }
+        msg: { type: string }
+        data:
+          type: array
+          items: { $ref: '#/components/schemas/SearchItem' }
+
+  examples:
+    DocListSuccess:
+      value:
+        code: 200
+        msg: success
+        data:
+          - { id: "doc_1", source_id: "yuque:1", source: yuque, title: "A", summary: "...", tags: ["éç¥"], created_at: "2025-10-10T09:00:00Z" }
+          - { id: "doc_2", source_id: "web:2", source: web, title: "B", summary: "...", tags: ["æ´»å¨"], created_at: "2025-10-09T09:00:00Z" }
+    DocDetailSuccess:
+      value:
+        code: 200
+        msg: success
+        data:
+          id: doc_1
+          source_id: yuque:1
+          source: yuque
+          title: ç¤ºä¾æ é¢
+          content: è¿æ¯æ­£æ...
+          summary: æè¦...
+          tags: [éç¥]
+          author: å¼ ä¸
+          url: https://...
+          created_at: 2025-10-10T09:00:00Z
+          updated_at: 2025-10-10T10:00:00Z
+    CreateDocRequest:
+      value:
+        title: æ°ææ¡£
+        content: æ­£æåå®¹
+        tags: [éç¥]
+        source: yuque
+    PreprocessCleanRequest:
+      value:
+        content: "ãå¹¿åãåå­¦ä»¬å¤§å®¶å¥½ï¼\næ´»å¨æ¶é´ï¼..."
+    ImportJobRequest:
+      value:
+        path: s3://bucket/folder/docs-20251010.ndjson.gz
+        format: ndjson
+        schema_version: "1.0.0"
+        source: yuque
+    DocVersionListSuccess:
+      value:
+        code: 200
+        msg: success
+        data:
+          versions:
+            - version_id: v1
+              message: åå§çæ¬
+              author: ç¨æ·A
+              timestamp: "2025-10-10T09:00:00Z"
+            - version_id: v2
+              message: æ´æ°æ é¢
+              author: ç¨æ·B
+              timestamp: "2025-10-11T09:00:00Z"
+    DocVersionDetailSuccess:
+      value:
+        code: 200
+        msg: success
+        data:
+          content: è¿æ¯ææ¡£çç¹å®åå²çæ¬åå®¹ã
+    DocDiffSuccess:
+      value:
+        code: 200
+        msg: success
+        data:
+          diff: |-
+            --- a.txt
+            +++ b.txt
+            @@ -1,3 +1,3 @@
+            - Hello World
+            + Hello Nova
+            - This is a sample document.
+            + This is a Nova sample document.
+            - Have a nice day!
+            + Have a nice Nova day!
+    DocRevertSuccess:
+      value:
+        code: 200
+        msg: success
+        data:
+          new_version: v2

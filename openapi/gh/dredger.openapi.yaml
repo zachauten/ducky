@@ -1,0 +1,130 @@
+openapi: 3.1.0
+info:
+  title: My-Service
+  description: My service just do exist, so it mainly implements the mmost important API endpoints livez and readyz required by Kubernetes
+  version: 0.0.1
+servers:
+  - url: http://localhost:{port}
+    description: The main component container of the pod
+    variables:
+      port:
+        default: "8080"
+
+paths:
+  /:
+    get:
+      summary: Returns the index content of my service
+      tags:
+        - builtin
+      operationId: Root
+      responses:
+        "200":
+          description: This entrypoint delivers the index page.
+          content:
+            text/html:
+              schema:
+                type: string
+  /livez:
+    get:
+      summary: deliver the state of the service
+      tags:
+        - builtin
+      responses:
+        "200":
+          description: service is alive
+          content:
+            text/plain:
+              schema:
+                type: string
+  /readyz:
+    get:
+      summary: deliver the state of the service
+      tags:
+        - builtin
+      responses:
+        "200":
+          description: service is ready to service requests
+          content:
+            text/plain:
+              schema:
+                type: string
+        "503":
+          description: service is not ready to service requests, e.g. waiting to finish its initialisation or waiting for other services to become ready
+          content:
+            text/plain:
+              schema:
+                type: string
+  /infoz:
+    get:
+      summary: relevant meta information about the service
+      tags:
+        - builtin
+      responses:
+        "200":
+          description: deliver all properties like service name and version
+          content:
+            application/json:
+              schema:
+                type: string
+  /events:
+    get:
+      summary: SSE events service
+      tags:
+        - builtin
+      responses:
+        "200":
+          description: SSE event communication
+          content:
+            text/plain:
+              schema:
+                type: string
+    post:
+      summary: SSE events service
+      tags:
+        - builtin
+      responses:
+        "200":
+          description: SSE event communication
+          content:
+            text/plain:
+              schema:
+                type: string
+  /robots.txt:
+    get:
+      summary: return robots.txt to restrict web crawlers
+      tags:
+        - builtin
+      responses:
+        "200":
+          description: deliver robots.txt
+          content:
+            application/json:
+              schema:
+                type: string
+  /index.html:
+    get:
+      summary: index.html is the main page, which embeds content.html with the main content
+      tags:
+        - builtin
+      responses:
+        "200":
+          description: successfully deliver index.html
+          content:
+            text/html:
+              schema:
+                type: string
+  /content.html:
+    get:
+      summary: content.html contains the main content, which can be flexible embeded as a component in the overall index page
+      tags:
+        - builtin
+      responses:
+        "200":
+          description: successfully deliver content.html
+          content:
+            text/html:
+              schema:
+                type: string
+
+components:
+  schemas:

@@ -1,0 +1,88 @@
+openapi: 3.0.0
+info:
+  title: {{.DisplayName}} API
+  description: {{.DisplayName}} API ææ¡£
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@example.com
+servers:
+  - url: http://localhost:8080/api/v1
+    description: å¼åç¯å¢
+  - url: https://api.example.com/v1
+    description: çäº§ç¯å¢
+paths:
+  /health:
+    get:
+      summary: å¥åº·æ£æ¥
+      description: æ£æ¥æå¡å¥åº·ç¶æ
+      tags:
+        - Health
+      responses:
+        '200':
+          description: æå¡æ­£å¸¸
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "ok"
+  /users:
+    get:
+      summary: è·åç¨æ·åè¡¨
+      description: è·åææç¨æ·ä¿¡æ¯
+      tags:
+        - Users
+      responses:
+        '200':
+          description: æåè·åç¨æ·åè¡¨
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "success"
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        username:
+          type: string
+          example: "john_doe"
+        email:
+          type: string
+          example: "john@example.com"
+        nickname:
+          type: string
+          example: "John Doe"
+        status:
+          type: integer
+          example: 1
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - username
+        - email

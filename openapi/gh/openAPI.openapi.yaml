@@ -1,0 +1,233 @@
+openapi: 3.0.3
+info:
+  title: Onboarding API
+  description: "It's my student reference: STD22014"
+  version: 1.0.11
+servers:
+  - url: https://STD22014.com
+paths:
+  /students:
+    post:
+      tags:
+        - Student
+      summary: Add a new student
+      description: Add a new student
+      operationId: addStudent
+      requestBody:
+        description: Create a new student
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Student'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        '405':
+          description: Invalid input
+
+    get:
+      tags:
+        - Student
+      summary: Retrieve students
+      description: Retrieve students
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Student'
+        '400':
+          description: Invalid status value
+
+    put:
+      tags:
+        - Student
+      summary: Update a student
+      description: Update a student
+      requestBody:
+        description: Update student data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Student'
+        required: true
+      responses:
+        '200':
+          description: Student updated successfully
+        '500':
+          description: Internal Server Error
+
+    delete:
+      tags:
+        - Student
+      summary: Delete a student
+      description: Delete a student
+      responses:
+        '204':
+          description: Student deleted successfully
+        '500':
+          description: Internal Server Error
+
+  /teachers:
+    get:
+      tags:
+        - Teachers
+      summary: See all students
+      operationId: getTeachers
+      responses:
+        '200':
+          description: Results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Teacher'
+        '500':
+          description: Internal Server Error
+      security:
+        - petstore_auth:
+            - write:pets
+            - read:pets
+
+    post:
+      tags:
+        - Teachers
+      summary: New Teacher
+      operationId: addTeachers
+      requestBody:
+        description: To create a new teacher
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Teacher'
+      responses:
+        '201':
+          description: New teacher created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lastname:
+                    type: string
+                  firstname:
+                    type: string
+                  module:
+                    type: string
+                    format: date
+
+  /teachers/{teacherId}:
+    put:
+      tags:
+        - Teachers
+      summary: Update a Teacher
+      operationId: updateTeacher
+      parameters:
+        - name: teacherId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the Teacher
+      requestBody:
+        description: Update teacher data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Teacher'
+      responses:
+        '200':
+          description: Teacher updated successfully
+        '500':
+          description: Internal Server Error
+
+    delete:
+      tags:
+        - Teachers
+      summary: Delete a Teacher
+      operationId: deleteTeacher
+      parameters:
+        - name: teacherId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the teacher to delete
+      responses:
+        '204':
+          description: Teacher deleted successfully
+        '500':
+          description: Internal Server Error
+
+components:
+  schemas:
+    Student:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: MIORA NOMENJANAHARY
+        birthDate:
+          type: string
+          format: date
+
+    Teacher:
+      type: object
+      properties:
+        lastname:
+          type: string
+          example: ANDRIAMAHERY
+        firstname:
+          type: string
+          example: Ryan
+        module:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/API'
+              - $ref: '#/components/schemas/Prog3'
+
+    API:
+      type: object
+      properties:
+        courseName:
+          type: string
+          example: API rest
+        courseCode:
+          type: string
+          example: API
+        duration:
+          type: integer
+          format: int64
+          example: 2
+
+    Prog3:
+      type: object
+      properties:
+        courseName:
+          type: string
+          example: Spring Boot project
+        courseCode:
+          type: string
+          example: PROG3
+        duration:
+          type: integer
+          format: int64
+          example: 2

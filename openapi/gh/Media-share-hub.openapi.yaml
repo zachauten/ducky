@@ -1,0 +1,760 @@
+openapi: 3.0.3
+info:
+  title: EcoHub API
+  version: v1
+  description: Core API for EcoHub video platform MVP
+
+servers:
+  - url: https://api.ecohub.xyz/v1
+
+paths:
+  /auth/login:
+    post:
+      summary: Authenticate user via DID, magic wallet, or Web3 wallet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                method:
+                  type: string
+                  enum: [magic_wallet, web3_wallet, did]
+                credential:
+                  type: string
+      responses:
+        '200':
+          description: Authenticated user and token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+
+  /auth/zkp-age:
+    post:
+      summary: Submit zero-knowledge age proof
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                did:
+                  type: string
+                zkp_proof:
+                  type: string
+      responses:
+        '200':
+          description: Age verification result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  age_verified:
+                    type: boolean
+                  credential_id:
+                    type: string
+
+  /auth/me:
+    get:
+      summary: Get current user profile and verification status
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /users/{did}:
+    get:
+      summary: Get user profile by DID
+      parameters:
+        - name: did
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    patch:
+      summary: Update user profile
+      parameters:
+        - name: did
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                display_name:
+                  type: string
+                bio:
+                  type: string
+                avatar_url:
+                  type: string
+                email:
+                  type: string
+                socials:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /users/follow:
+    post:
+      summary: Follow or unfollow another user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                target_did:
+                  type: string
+                action:
+                  type: string
+                  enum: [follow, unfollow]
+      responses:
+        '200':
+          description: Follow result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  following:
+                    type: boolean
+
+  /videos/upload:
+    post:
+      summary: Upload video and metadata
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                video_file:
+                  type: string
+                  format: binary
+                title:
+                  type: string
+                tags:
+                  type: array
+                  items:
+                    type: string
+                description:
+                  type: string
+                restricted:
+                  type: boolean
+                language:
+                  type: string
+                category:
+                  type: string
+                duration:
+                  type: integer
+                resolution:
+                  type: string
+                comments_enabled:
+                  type: boolean
+      responses:
+        '200':
+          description: Upload status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  video_id:
+                    type: string
+                  status:
+                    type: string
+                  ipfs_hash:
+                    type: string
+                    nullable: true
+                  cdn_url:
+                    type: string
+                    nullable: true
+
+  /videos/{id}:
+    get:
+      summary: Get video metadata and streaming links
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Video metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Video'
+
+  /videos:
+    get:
+      summary: List/filter videos
+      parameters:
+        - name: tag
+          in: query
+          schema:
+            type: string
+        - name: restricted
+          in: query
+          schema:
+            type: boolean
+        - name: owner_did
+          in: query
+          schema:
+            type: string
+        - name: language
+          in: query
+          schema:
+            type: string
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Video list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Video'
+
+  /videos/{id}/like:
+    post:
+      summary: Like or unlike a video
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [like, unlike]
+      responses:
+        '200':
+          description: Like count
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  likes:
+                    type: integer
+
+  /search:
+    get:
+      summary: Search videos
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+        - name: tag
+          in: query
+          schema:
+            type: string
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: language
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Video'
+
+  /feed:
+    get:
+      summary: Get user feed
+      responses:
+        '200':
+          description: Feed videos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Video'
+
+  /subscriptions:
+    get:
+      summary: Get videos from followed creators
+      responses:
+        '200':
+          description: Subscribed videos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Video'
+
+  /wallet/balance:
+    get:
+      summary: Get user token balances
+      responses:
+        '200':
+          description: Token balances
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reward_token:
+                    type: string
+                  utility_token:
+                    type: string
+                  last_settlement_at:
+                    type: string
+
+  /wallet/tip:
+    post:
+      summary: Tip creator (Reward Token)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                to_did:
+                  type: string
+                amount:
+                  type: string
+      responses:
+        '200':
+          description: Tip result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  tx_hash:
+                    type: string
+
+  /wallet/convert:
+    post:
+      summary: Fiat on/off ramp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: string
+                direction:
+                  type: string
+                  enum: [crypto_to_fiat, fiat_to_crypto]
+      responses:
+        '200':
+          description: Conversion result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  provider_url:
+                    type: string
+
+  /wallet/transactions:
+    get:
+      summary: Get token transaction history
+      responses:
+        '200':
+          description: Token transactions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+
+  /rewards/event:
+    post:
+      summary: Log engagement event (watch, like, share)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                video_id:
+                  type: string
+                event_type:
+                  type: string
+                  enum: [watch, like, share]
+                watch_seconds:
+                  type: integer
+                reward_type:
+                  type: string
+      responses:
+        '200':
+          description: Reward credited
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  reward_credited:
+                    type: string
+
+  /rewards/summary:
+    get:
+      summary: Get total earned rewards
+      responses:
+        '200':
+          description: Rewards summary
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_earned:
+                    type: string
+                  pending_settlement:
+                    type: string
+                  last_settlement:
+                    type: string
+
+  /creator/analytics:
+    get:
+      summary: Get creator analytics
+      responses:
+        '200':
+          description: Creator analytics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  videos:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        video_id:
+                          type: string
+                        views:
+                          type: integer
+                        likes:
+                          type: integer
+                        rewards_earned:
+                          type: string
+                        status:
+                          type: string
+                  totals:
+                    type: object
+                    properties:
+                      views:
+                        type: integer
+                      likes:
+                        type: integer
+                      rewards_earned:
+                        type: string
+
+  /governance/forum:
+    get:
+      summary: List forum topics/threads (read-only)
+      responses:
+        '200':
+          description: Forum topics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ForumTopic'
+
+  /governance/forum/{id}:
+    get:
+      summary: Get topic/thread details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Forum topic details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForumTopicDetail'
+
+  /notifications:
+    get:
+      summary: Get user notifications
+      responses:
+        '200':
+          description: Notifications list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+
+  /audit/logs:
+    get:
+      summary: Get audit logs (admin only)
+      responses:
+        '200':
+          description: Audit log entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditLog'
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        did:
+          type: string
+        display_name:
+          type: string
+        bio:
+          type: string
+        avatar_url:
+          type: string
+        email:
+          type: string
+        socials:
+          type: array
+          items:
+            type: string
+        followers:
+          type: integer
+        following:
+          type: integer
+        age_verified:
+          type: boolean
+        status:
+          type: string
+        created_at:
+          type: string
+        updated_at:
+          type: string
+        deleted_at:
+          type: string
+          nullable: true
+        wallets:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              address:
+                type: string
+              is_custodial:
+                type: boolean
+
+    Video:
+      type: object
+      properties:
+        video_id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        owner_did:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        deleted_at:
+          type: string
+          nullable: true
+        views:
+          type: integer
+        likes:
+          type: integer
+        restricted:
+          type: boolean
+        ipfs_hash:
+          type: string
+        cdn_url:
+          type: string
+        thumbnails:
+          type: array
+          items:
+            type: string
+        duration:
+          type: integer
+        resolution:
+          type: string
+        status:
+          type: string
+        language:
+          type: string
+        category:
+          type: string
+        comments_enabled:
+          type: boolean
+
+    Transaction:
+      type: object
+      properties:
+        type:
+          type: string
+        amount:
+          type: string
+        to_did:
+          type: string
+        tx_hash:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    ForumTopic:
+      type: object
+      properties:
+        topic_id:
+          type: string
+        title:
+          type: string
+        created_by:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        is_pinned:
+          type: boolean
+        is_locked:
+          type: boolean
+
+    ForumTopicDetail:
+      type: object
+      properties:
+        topic_id:
+          type: string
+        title:
+          type: string
+        posts:
+          type: array
+          items:
+            type: object
+            properties:
+              post_id:
+                type: string
+              author:
+                type: string
+              content:
+                type: string
+              created_at:
+                type: string
+                format: date-time
+
+    Notification:
+      type: object
+      properties:
+        notification_id:
+          type: string
+        type:
+          type: string
+        message:
+          type: string
+        created_at:
+          type: string
+        read:
+          type: boolean
+
+    AuditLog:
+      type: object
+      properties:
+        log_id:
+          type: string
+        action:
+          type: string
+        actor_did:
+          type: string
+        resource_type:
+          type: string
+        resource_id:
+          type: string
+        timestamp:
+          type: string
+        details:
+          type: string

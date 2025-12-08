@@ -1,0 +1,34 @@
+version: 3
+
+includes:
+  npm_utils: https://raw.githubusercontent.com/Terradue/taskfile-utils/refs/heads/main/npm.yaml
+  pip_utils: https://raw.githubusercontent.com/Terradue/taskfile-utils/refs/heads/main/pip.yaml
+
+tasks:
+
+  bundle:
+    desc: Given an input OpenAPI YAML document, bundles the API description.
+    deps:
+    - task: npm_utils:conditional_install
+      vars:
+        PACKAGE: '@redocly/cli'
+    cmds:
+    - redocly bundle {{.API}} --output={{.OUTPUT}} --remove-unused-components --lint-config
+
+  generate_docs:
+    desc: Given an input OpenAPI YAML document, creates Redocly human-readable documentation.
+    deps:
+    - task: npm_utils:conditional_install
+      vars:
+        PACKAGE: '@redocly/cli'
+    cmds:
+    - redocly build-docs {{.API}} --output={{.OUTPUT}}
+
+  generate_skeleton:
+    desc: Given an input OpenAPI YAML document, creates FastAPI server skeleton with Pydantic v2 models.
+    deps:
+    - task: pip_utils:conditional_install
+      vars:
+        PACKAGE: fastapi-code-generator
+    cmds:
+    - fastapi-codegen --input {{.API}} --output {{.OUTPUT}} --output-model-type pydantic_v2.BaseModel

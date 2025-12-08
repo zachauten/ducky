@@ -1,0 +1,87 @@
+{# openapi.yaml.jinja #}
+openapi: 3.0.3
+info:
+  title: Generated API
+  version: 1.0.0
+
+paths:
+{%- for model_name, model_spec in models.items() %}
+  /{{ model_name.lower() }}/query:
+    post:
+      summary: Query {{ model_name }} with nested filters and field selection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueryRequest'
+      responses:
+        '200':
+          description: A list of {{ model_name }} results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/{{ model_name }}Schema'
+{%- endfor %}
+
+components:
+  schemas:
+    QueryRequest:
+      type: object
+      properties:
+        fields:
+          type: array
+          items:
+            type: string
+          description: |-
+            List of root-level fields to return; omit or empty for all.
+        filters:
+          type: object
+          additionalProperties:
+            oneOf:
+              - type: string
+              - type: integer
+              - type: boolean
+          description: |-
+            Exact-match filters on the root model.
+        include:
+          type: object
+          description: |-
+            Map of relation names â NestedInclude specs for nested queries.
+          additionalProperties:
+            $ref: '#/components/schemas/NestedInclude'
+      required: []
+
+    NestedInclude:
+      type: object
+      properties:
+        fields:
+          type: array
+          items:
+            type: string
+          description: |-
+            List of fields to return for the related model.
+        filters:
+          type: object
+          additionalProperties:
+            oneOf:
+              - type: string
+              - type: integer
+              - type: boolean
+          description: |-
+            Exact-match filters on the related model.
+        include:
+          type: object
+          description: |-
+            Further nested includes, same structure as parent.
+          additionalProperties:
+            $ref: '#/components/schemas/NestedInclude'
+      required: []
+
+{# Include generated schemas for each model #}
+{%- for model_name in models.keys() %}
+    {{ model_name }}Schema:
+      $ref: '../schemas.py#/components/schemas/{{ model_name }}Schema'
+{%- endfor %}

@@ -8,3 +8,15 @@ I found link:https://github.com/OpenAPITools/openapi-generator[openapi-generator
 ```
 deno run -A main.ts ./openapi/test.yaml
 ```
+
+== Validate files
+[source,bash]
+```
+deno run -A "npm:swagger-cli" validate {file}
+```
+
+== Convert openapi3 to typespec
+[source,bash]
+```
+deno run -A "npm:@typespec/openapi3" -output-dir ./out {file}
+```

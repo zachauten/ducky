@@ -1,0 +1,443 @@
+openapi: 3.0.0
+info:
+  title: 'flowermate-api'
+  description: 'æ¬apiè®¾è®¡è¾ä¸ºç®éï¼å¹¶ä¸å®å¨ç¬¦årestful apiè§èï¼ä»ä¾ç»ä¹ åè'
+  version: '1.0.0'
+
+servers:
+  - url: /api
+
+security:
+  - auth: []
+
+components:
+  securitySchemes:
+    auth:
+      type: http
+      scheme: bearer
+
+paths:
+  /user:
+    post:
+      security: []
+      summary: æ³¨åç¨æ·
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                pwd:
+                  type: string
+                  format: password
+              required:
+                - username
+                - email
+                - pwd
+      responses:
+        200:
+          content:
+            application/json:
+              schema:       
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  msg:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      token:
+                        type: string
+
+  /user/{id}:
+    put:
+      summary: æ´æ°ç¨æ·
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ç¨æ·id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                avatar:
+                  type: integer
+                username:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                pwd:
+                  type: string
+                  format: password
+      responses:
+        200:
+          content:
+            application/json:
+              schema:       
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+
+  /login:
+    post:
+      security: []
+      summary: ç»å½
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                username:
+                  type: string
+                pwd:
+                  type: string
+                  format: password
+              required:
+                - username
+                - pwd    
+      responses:
+        200:
+          content:
+            application/json:
+              schema:       
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  msg:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      token:
+                        type: string
+                      avatar:
+                        type: integer
+
+  /file:
+    post:
+      summary: ä¸ä¼ æä»¶ï¼è¿åæä»¶id
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    type: integer
+   
+  /file/{id}:
+    get:
+      summary: è¿åæå®idå¯¹åºçæä»¶
+      parameters:
+        - in: path
+          name: id   
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: æä»¶id
+      responses:
+        200:
+          content:
+            image/jpg:
+              schema:
+                type: string
+                format: binary
+  /feed:
+    post:
+      summary: åè¡¨å¨æ
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                desc:
+                  type: string
+                images:
+                  type: array
+                  items:
+                    type: integer
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      id: 
+                        type: integer
+                      images: 
+                        type: array
+                        items:
+                          type: integer
+                      desc: 
+                        type: string
+                      userId: 
+                        type: integer
+    get:
+      summary: è·åå¨æåè¡¨
+      parameters:
+        - in: query
+          name: offset   
+          required: true
+          schema:
+            type: integer
+          description: åé¡µèµ·å§å¼
+        - in: query
+          name: limit   
+          required: true
+          schema:
+            type: integer
+          description: åé¡µæ¯é¡µæ°é
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      rows:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id: 
+                              type: integer
+                            images: 
+                              type: array
+                              items:
+                                type: integer
+                            desc: 
+                              type: string
+                            userId: 
+                              type: integer
+                            feedLikes:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  userId:
+                                    type: string
+  
+  /feedlike:
+    post:
+      summary: ç¹èµ/åæ¶ç¹èµ
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [like, unlike]
+                  description: ç¹èµæåæ¶ç¹èµçå¨ä½
+                feedId:
+                  type: integer
+                  description: ç¹èµ/åæ¶ç¹èµçå¨æid
+              required:
+                - action
+                - feedId
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+
+  /location:
+    get:
+      summary: æ ¹æ®å½åå°çä½ç½®è·åéè¿çé´å®è®°å½
+      parameters:
+        - in: query
+          name: lon   
+          required: true
+          schema:
+            type: number
+          description: ä¸­å¿ç¹ç»åº¦
+        - in: query
+          name: lat   
+          required: true
+          schema:
+            type: number
+          description: ä¸­å¿ç¹çº¬åº¦
+        - in: query
+          name: lonDelta   
+          required: true
+          schema:
+            type: number
+          description: ç»åº¦èå´
+        - in: query
+          name: latDelta  
+          required: true
+          schema:
+            type: number
+          description: çº¬åº¦èå´
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: 
+                          type: integer
+                        image: 
+                          type: integer
+                        lon: 
+                          type: number
+                        lat: 
+                          type: number
+                        extra:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            score:
+                              type: string
+                            baike_info:
+                              nullable: true
+                              type: object
+                              properties:
+                                image_url: 
+                                  type: string
+                                baike_url:
+                                  type: string
+
+  /report:
+    post:
+      summary: æäº¤æ¤ç©é´å®
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: integer
+                lon: 
+                  type: number
+                lat: 
+                  type: number
+              required:
+                - image
+                - lon
+                - lat
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+    get:
+      summary: è·åæçé´å®åè¡¨
+      parameters:
+        - in: query
+          name: offset   
+          required: true
+          schema:
+            type: integer
+          description: åé¡µèµ·å§å¼
+        - in: query
+          name: limit   
+          required: true
+          schema:
+            type: integer
+          description: åé¡µæ¯é¡µæ°é
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id: 
+                        type: integer
+                      image: 
+                        type: integer
+                      lon: 
+                        type: number
+                      lat: 
+                        type: number
+                      extra:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          score:
+                            type: string
+                          baike_info:
+                            nullable: true
+                            type: object
+                            properties:
+                              image_url: 
+                                type: string
+                              baike_url:
+                                type: string
+
+
+
+
