@@ -1,0 +1,37 @@
+openapi: 3.1.0
+info:
+  title: Shipments API
+  version: 3.8.0
+tags:
+  - name: Shipments
+paths:
+  /shipments:
+    get:
+      operationId: list
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ShipmentList"
+      tags:
+        - Shipments
+components:
+  schemas:
+    Shipment:
+      type: object
+      properties:
+        id:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+    ShipmentList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Shipment"

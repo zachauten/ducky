@@ -1,0 +1,33 @@
+openapi: 3.1.0
+info:
+  title: Brands API
+  version: 4.3.0
+tags:
+  - name: Brands
+paths:
+  /brands:
+    get:
+      operationId: list
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BrandList"
+      tags:
+        - Brands
+components:
+  schemas:
+    Brand:
+      type: object
+      properties:
+        id:
+          type: string
+    BrandList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Brand"

@@ -1,0 +1,109 @@
+openapi: 3.1.0
+info:
+  title: Reviews API
+  version: 2.1.0
+tags:
+  - name: Reviews
+paths:
+  /reviews:
+    get:
+      operationId: list
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReviewList"
+      tags:
+        - Reviews
+    post:
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewCreate"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+      tags:
+        - Reviews
+  /reviews/{id}:
+    get:
+      operationId: get
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+      tags:
+        - Reviews
+    delete:
+      operationId: delete
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+      tags:
+        - Reviews
+components:
+  schemas:
+    Review:
+      type: object
+      required:
+        - id
+        - rating
+        - status
+      properties:
+        id:
+          type: string
+        rating:
+          type: integer
+        status:
+          type: string
+          enum:
+            - active
+            - inactive
+            - pending
+        comment:
+          type: string
+    ReviewCreate:
+      type: object
+      required:
+        - rating
+      properties:
+        rating:
+          type: integer
+        status:
+          type: string
+          enum:
+            - active
+            - inactive
+            - pending
+        comment:
+          type: string
+    ReviewList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Review"

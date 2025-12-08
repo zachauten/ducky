@@ -1,0 +1,40 @@
+openapi: 3.1.0
+info:
+  title: Inventory API
+  version: 7.5.0
+tags:
+  - name: Inventory
+paths:
+  /inventory:
+    get:
+      operationId: list
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InventoryList"
+      tags:
+        - Inventory
+components:
+  schemas:
+    Inventory:
+      type: object
+      required:
+        - status
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum:
+            - in_stock
+            - out_of_stock
+    InventoryList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Inventory"

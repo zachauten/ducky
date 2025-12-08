@@ -1,0 +1,131 @@
+openapi: 3.1.0
+info:
+  title: Shipments Service API
+  version: 1.8.0
+  description: API for managing shipments
+tags:
+  - name: Shipments
+paths:
+  /shipments:
+    get:
+      operationId: Shipments_list
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ShipmentList"
+      tags:
+        - Shipments
+    post:
+      operationId: Shipments_create
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shipment"
+      tags:
+        - Shipments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ShipmentCreate"
+  /shipments/{id}:
+    get:
+      operationId: Shipments_get
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shipment"
+      tags:
+        - Shipments
+    delete:
+      operationId: Shipments_delete
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+      tags:
+        - Shipments
+components:
+  schemas:
+    Shipment:
+      type: object
+      required:
+        - id
+        - name
+        - status
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+          enum:
+            - active
+            - inactive
+            - pending
+        tags:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+    ShipmentCreate:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        status:
+          type: string
+          enum:
+            - active
+            - inactive
+            - pending
+        tags:
+          type: array
+          items:
+            type: string
+    ShipmentList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Shipment"
+        total:
+          type: integer
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string

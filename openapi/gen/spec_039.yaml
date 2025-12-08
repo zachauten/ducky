@@ -1,0 +1,40 @@
+openapi: 3.1.0
+info:
+  title: Notifications API
+  version: 3.9.0
+tags:
+  - name: Notifications
+paths:
+  /notifications:
+    get:
+      operationId: list
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationList"
+      tags:
+        - Notifications
+components:
+  schemas:
+    Notification:
+      type: object
+      required:
+        - status
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum:
+            - active
+            - inactive
+    NotificationList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Notification"

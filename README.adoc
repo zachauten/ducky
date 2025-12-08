@@ -8,3 +8,9 @@ I found link:https://github.com/OpenAPITools/openapi-generator[openapi-generator
 ```
 deno run -A main.ts ./openapi/test.yaml
 ```
+
+== Validating an openapi spec
+[source,bash]
+```
+deno run -A "npm:swagger-cli" validate
+```

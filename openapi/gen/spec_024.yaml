@@ -1,0 +1,107 @@
+openapi: 3.1.0
+info:
+  title: Suppliers API
+  version: 2.4.0
+tags:
+  - name: Suppliers
+paths:
+  /suppliers:
+    get:
+      operationId: list
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SupplierList"
+      tags:
+        - Suppliers
+    post:
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SupplierCreate"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Supplier"
+      tags:
+        - Suppliers
+  /suppliers/{id}:
+    get:
+      operationId: get
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Supplier"
+      tags:
+        - Suppliers
+components:
+  schemas:
+    Supplier:
+      type: object
+      required:
+        - id
+        - name
+        - status
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+          enum:
+            - active
+            - inactive
+        tags:
+          type: array
+          items:
+            type: string
+        metadata:
+          $ref: "#/components/schemas/Metadata"
+    SupplierCreate:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        status:
+          type: string
+          enum:
+            - active
+            - inactive
+        tags:
+          type: array
+          items:
+            type: string
+    SupplierList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Supplier"
+    Metadata:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string

@@ -1,0 +1,37 @@
+openapi: 3.1.0
+info:
+  title: Categories API
+  version: 6.2.0
+tags:
+  - name: Categories
+paths:
+  /categories:
+    get:
+      operationId: list
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CategoryList"
+      tags:
+        - Categories
+components:
+  schemas:
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+    CategoryList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Category"
