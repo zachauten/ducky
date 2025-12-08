@@ -1,0 +1,284 @@
+openapi: 3.1.0
+info:
+  title: Shipments Service API
+  version: 0.8.0
+  description: API for managing shipments
+tags:
+  - name: Shipments
+paths:
+  /shipments:
+    get:
+      operationId: Shipments_list
+      description: List all shipments
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ShipmentList"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Shipments
+    post:
+      operationId: Shipments_create
+      description: Create a new shipment
+      parameters: []
+      responses:
+        "201":
+          description: Created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shipment"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Shipments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ShipmentCreate"
+  /shipments/{id}:
+    get:
+      operationId: Shipments_get
+      description: Get a specific shipment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shipment"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Shipments
+    put:
+      operationId: Shipments_update
+      description: Update a shipment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shipment"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Shipments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ShipmentUpdate"
+    delete:
+      operationId: Shipments_delete
+      description: Delete a shipment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted successfully
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Shipments
+  /shipments/{id}/activate:
+    post:
+      operationId: Shipments_activate
+      description: Activate a shipment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Activated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shipment"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Shipments
+  /shipments/search:
+    get:
+      operationId: Shipments_search
+      description: Search shipments
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ShipmentList"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Shipments
+components:
+  schemas:
+    Shipment:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        metadata:
+          $ref: "#/components/schemas/Metadata"
+    ShipmentCreate:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+    ShipmentUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+    ShipmentList:
+      type: object
+      required:
+        - items
+        - total
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Shipment"
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+        details:
+          type: string
+    Metadata:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+        type:
+          type: string

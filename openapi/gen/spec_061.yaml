@@ -1,0 +1,33 @@
+openapi: 3.1.0
+info:
+  title: Reviews API
+  version: 6.1.0
+tags:
+  - name: Reviews
+paths:
+  /reviews:
+    get:
+      operationId: list
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReviewList"
+      tags:
+        - Reviews
+components:
+  schemas:
+    Review:
+      type: object
+      properties:
+        id:
+          type: string
+    ReviewList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Review"

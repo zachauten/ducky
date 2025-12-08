@@ -1,0 +1,259 @@
+openapi: 3.1.0
+info:
+  title: Payments Service API
+  version: 0.4.0
+  description: API for managing payments
+tags:
+  - name: Payments
+paths:
+  /payments:
+    get:
+      operationId: Payments_list
+      description: List all payments
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentList"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Payments
+    post:
+      operationId: Payments_create
+      description: Create a new payment
+      parameters: []
+      responses:
+        "201":
+          description: Created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Payments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentCreate"
+  /payments/{id}:
+    get:
+      operationId: Payments_get
+      description: Get a specific payment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Payments
+    put:
+      operationId: Payments_update
+      description: Update a payment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Payments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentUpdate"
+    delete:
+      operationId: Payments_delete
+      description: Delete a payment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted successfully
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Payments
+  /payments/{id}/activate:
+    post:
+      operationId: Payments_activate
+      description: Activate a payment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Activated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Payments
+components:
+  schemas:
+    Payment:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        metadata:
+          $ref: "#/components/schemas/Metadata"
+    PaymentCreate:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+    PaymentUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+    PaymentList:
+      type: object
+      required:
+        - items
+        - total
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Payment"
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+        details:
+          type: string
+    Metadata:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+        type:
+          type: string

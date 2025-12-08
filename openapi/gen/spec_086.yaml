@@ -1,0 +1,37 @@
+openapi: 3.1.0
+info:
+  title: Stores API
+  version: 8.6.0
+tags:
+  - name: Stores
+paths:
+  /stores:
+    get:
+      operationId: list
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StoreList"
+      tags:
+        - Stores
+components:
+  schemas:
+    Store:
+      type: object
+      properties:
+        id:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+    StoreList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Store"

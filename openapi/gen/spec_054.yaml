@@ -1,0 +1,44 @@
+openapi: 3.1.0
+info:
+  title: Payments API
+  version: 5.4.0
+tags:
+  - name: Payments
+paths:
+  /payments:
+    get:
+      operationId: list
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentList"
+      tags:
+        - Payments
+components:
+  schemas:
+    Payment:
+      type: object
+      required:
+        - status
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum:
+            - pending
+            - completed
+        tags:
+          type: array
+          items:
+            type: string
+    PaymentList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Payment"

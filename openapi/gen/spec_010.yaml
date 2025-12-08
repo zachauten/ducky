@@ -1,0 +1,259 @@
+openapi: 3.1.0
+info:
+  title: Analytics Service API
+  version: 1.0.0
+  description: API for managing analytics
+tags:
+  - name: Analytics
+paths:
+  /analytics:
+    get:
+      operationId: Analytics_list
+      description: List all analytics
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyticList"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Analytics
+    post:
+      operationId: Analytics_create
+      description: Create a new analytic
+      parameters: []
+      responses:
+        "201":
+          description: Created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Analytic"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Analytics
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalyticCreate"
+  /analytics/{id}:
+    get:
+      operationId: Analytics_get
+      description: Get a specific analytic
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Analytic"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Analytics
+    put:
+      operationId: Analytics_update
+      description: Update a analytic
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Analytic"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Analytics
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalyticUpdate"
+    delete:
+      operationId: Analytics_delete
+      description: Delete a analytic
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted successfully
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Analytics
+  /analytics/{id}/deactivate:
+    post:
+      operationId: Analytics_deactivate
+      description: Deactivate a analytic
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Deactivated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Analytic"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Analytics
+components:
+  schemas:
+    Analytic:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        metadata:
+          $ref: "#/components/schemas/Metadata"
+    AnalyticCreate:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+    AnalyticUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+    AnalyticList:
+      type: object
+      required:
+        - items
+        - total
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Analytic"
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+        details:
+          type: string
+    Metadata:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+        type:
+          type: string

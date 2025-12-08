@@ -1,0 +1,52 @@
+openapi: 3.1.0
+info:
+  title: Tasks API
+  version: 9.0.0
+tags:
+  - name: Tasks
+paths:
+  /tasks:
+    get:
+      operationId: list
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskList"
+      tags:
+        - Tasks
+components:
+  schemas:
+    Task:
+      type: object
+      required:
+        - status
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum:
+            - todo
+            - in_progress
+            - done
+        tags:
+          type: array
+          items:
+            type: string
+        metadata:
+          $ref: "#/components/schemas/Metadata"
+    TaskList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Task"
+    Metadata:
+      type: object
+      properties:
+        key:
+          type: string

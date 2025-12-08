@@ -1,0 +1,37 @@
+openapi: 3.1.0
+info:
+  title: Tasks API
+  version: 7.0.0
+tags:
+  - name: Tasks
+paths:
+  /tasks:
+    get:
+      operationId: list
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskList"
+      tags:
+        - Tasks
+components:
+  schemas:
+    Task:
+      type: object
+      properties:
+        id:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+    TaskList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Task"

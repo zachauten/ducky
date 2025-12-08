@@ -1,0 +1,41 @@
+openapi: 3.1.0
+info:
+  title: Invoices API
+  version: 5.7.0
+tags:
+  - name: Invoices
+paths:
+  /invoices:
+    get:
+      operationId: list
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvoiceList"
+      tags:
+        - Invoices
+components:
+  schemas:
+    Invoice:
+      type: object
+      required:
+        - status
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum:
+            - draft
+            - sent
+            - paid
+    InvoiceList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Invoice"

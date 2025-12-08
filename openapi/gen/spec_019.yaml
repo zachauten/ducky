@@ -1,0 +1,89 @@
+openapi: 3.1.0
+info:
+  title: Notifications API
+  version: 1.9.0
+tags:
+  - name: Notifications
+paths:
+  /notifications:
+    get:
+      operationId: list
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationList"
+      tags:
+        - Notifications
+    post:
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificationCreate"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notification"
+      tags:
+        - Notifications
+  /notifications/{id}:
+    get:
+      operationId: get
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notification"
+      tags:
+        - Notifications
+components:
+  schemas:
+    Notification:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    NotificationCreate:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+    NotificationList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Notification"
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string

@@ -1,0 +1,136 @@
+openapi: 3.1.0
+info:
+  title: Invoices Service API
+  version: 1.7.0
+  description: API for managing invoices
+tags:
+  - name: Invoices
+paths:
+  /invoices:
+    get:
+      operationId: Invoices_list
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvoiceList"
+      tags:
+        - Invoices
+    post:
+      operationId: Invoices_create
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invoice"
+      tags:
+        - Invoices
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvoiceCreate"
+  /invoices/{id}:
+    get:
+      operationId: Invoices_get
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invoice"
+      tags:
+        - Invoices
+    put:
+      operationId: Invoices_update
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invoice"
+      tags:
+        - Invoices
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvoiceUpdate"
+components:
+  schemas:
+    Invoice:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        amount:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+    InvoiceCreate:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        amount:
+          type: number
+    InvoiceUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        amount:
+          type: number
+    InvoiceList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Invoice"
+        total:
+          type: integer
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+        message:
+          type: string

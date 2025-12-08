@@ -1,0 +1,236 @@
+openapi: 3.1.0
+info:
+  title: Invoices Service API
+  version: 0.7.0
+  description: API for managing invoices
+tags:
+  - name: Invoices
+paths:
+  /invoices:
+    get:
+      operationId: Invoices_list
+      description: List all invoices
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvoiceList"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Invoices
+    post:
+      operationId: Invoices_create
+      description: Create a new invoice
+      parameters: []
+      responses:
+        "201":
+          description: Created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invoice"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Invoices
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvoiceCreate"
+  /invoices/{id}:
+    get:
+      operationId: Invoices_get
+      description: Get a specific invoice
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invoice"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Invoices
+    put:
+      operationId: Invoices_update
+      description: Update a invoice
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invoice"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Invoices
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvoiceUpdate"
+    delete:
+      operationId: Invoices_delete
+      description: Delete a invoice
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted successfully
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Invoices
+  /invoices/{id}/deactivate:
+    post:
+      operationId: Invoices_deactivate
+      description: Deactivate a invoice
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Deactivated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invoice"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Invoices
+components:
+  schemas:
+    Invoice:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    InvoiceCreate:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+    InvoiceUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+    InvoiceList:
+      type: object
+      required:
+        - items
+        - total
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Invoice"
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+        details:
+          type: string

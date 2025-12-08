@@ -1,0 +1,58 @@
+openapi: 3.1.0
+info:
+  title: Warehouses API
+  version: 2.5.0
+tags:
+  - name: Warehouses
+paths:
+  /warehouses:
+    get:
+      operationId: list
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WarehouseList"
+      tags:
+        - Warehouses
+  /warehouses/{id}:
+    get:
+      operationId: get
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Warehouse"
+      tags:
+        - Warehouses
+components:
+  schemas:
+    Warehouse:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        location:
+          type: string
+    WarehouseList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Warehouse"

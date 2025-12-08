@@ -1,0 +1,44 @@
+openapi: 3.1.0
+info:
+  title: Products API
+  version: 5.2.0
+tags:
+  - name: Products
+paths:
+  /products:
+    get:
+      operationId: list
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductList"
+      tags:
+        - Products
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        metadata:
+          $ref: "#/components/schemas/Metadata"
+    ProductList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Product"
+    Metadata:
+      type: object
+      properties:
+        key:
+          type: string
