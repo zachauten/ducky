@@ -1,0 +1,11 @@
+package {{packageName}};
+
+{{#hasList}}
+import java.util.List;
+{{/hasList}}
+
+public record {{className}} (
+{{#fields}}
+    {{{type}}} {{name}}{{^last}},{{/last}}
+{{/fields}}
+) {}
