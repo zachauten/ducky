@@ -1,0 +1,4 @@
+package {{packageName}};
+
+public sealed interface {{className}} permits {{#implementations}}{{name}}{{^last}}, {{/last}}{{/implementations}} {
+}
